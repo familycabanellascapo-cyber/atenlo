@@ -1,4 +1,4 @@
-# Automatizando en Mallorca
+# Atenlo — blog de automatización de negocios
 
 Base del blog en Next.js (App Router + TypeScript + Tailwind). Sin base de datos:
 los artículos son archivos Markdown en `content/posts/`, así que puedes escribir uno
@@ -38,7 +38,7 @@ lo repasamos juntos.
    ```
 3. Guarda, haz commit y push. Aparece solo en `/` y en `/blog`, ordenado por fecha.
 
-Ya tienes 3 artículos de ejemplo en `content/posts/` con notas entre corchetes
+Ya tienes varios artículos de ejemplo en `content/posts/` con notas entre corchetes
 señalando dónde meter tus datos reales (clientes, números, anécdotas). Sustitúyelos
 o bórralos cuando tengas contenido propio.
 

@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className="border-t border-line mt-24">
       <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-muted">
         <p>
-          © {new Date().getFullYear()} {site.name}. Escrito por {site.author} desde Mallorca.
+          © {new Date().getFullYear()} {site.name}. Automatizaciones para negocios, contadas con números reales.
         </p>
         <div className="flex gap-5 font-mono">
           <Link href="/aviso-legal" className="hover:text-paper transition-colors">

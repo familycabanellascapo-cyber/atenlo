@@ -1,10 +1,10 @@
 export const site = {
-  name: "Automatizando en Mallorca",
-  tagline: "Cuaderno de bitácora: automatizaciones reales con IA para negocios en Mallorca",
-  author: "Miquel",
-  url: "https://automatizando-en-mallorca.vercel.app",
+  name: "Atenlo",
+  tagline: "Cuaderno de bitácora: automatizaciones reales con IA para cualquier negocio",
+  author: "Atenlo",
+  url: "https://atenlo.vercel.app",
   description:
-    "Documento en abierto cómo automatizo procesos con IA para negocios reales (hostelería y pymes) en Mallorca: flujos de n8n y Make, agentes de IA, resultados y errores, sin filtros de agencia.",
+    "Documento en abierto cómo automatizo procesos con IA para negocios de cualquier sector y tamaño: flujos de n8n y Make, agentes de IA, resultados y errores, sin filtros de agencia.",
   nav: [
     { href: "/blog", label: "Blog" },
     { href: "/herramientas/ahorro-automatizacion", label: "Herramienta" },

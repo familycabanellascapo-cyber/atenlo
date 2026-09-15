@@ -14,10 +14,10 @@ export default function Contacto() {
         quitando tiempo y te digo si tiene sentido automatizarla.
       </p>
       <a
-        href="mailto:hola@automatizando-en-mallorca.com"
+        href="mailto:hola@atenlo.com"
         className="inline-block font-mono text-sm border border-amber text-amber px-5 py-3 hover:bg-amber hover:text-ink transition-colors"
       >
-        hola@automatizando-en-mallorca.com
+        hola@atenlo.com
       </a>
       <p className="text-muted text-sm mt-10">
         Nota: cambia esta dirección por tu correo real antes de publicar. Si más

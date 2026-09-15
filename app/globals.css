@@ -92,3 +92,27 @@ textarea:focus-visible {
   color: #9ca3af;
   margin: 1.5rem 0;
 }
+
+.prose-log table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.prose-log th,
+.prose-log td {
+  border: 1px solid #2a2f38;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose-log th {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #9ca3af;
+  background: #1c2027;
+}

@@ -9,30 +9,30 @@ export default function Home() {
     <div className="max-w-5xl mx-auto px-6">
       {/* Hero */}
       <section className="pt-16 pb-14 border-b border-line">
-        <p className="font-mono text-sm text-teal mb-4">Diario de automatización · Mallorca</p>
+        <p className="font-mono text-sm text-teal mb-4">Diario de automatización · para cualquier negocio</p>
         <h1 className="font-display text-4xl sm:text-5xl leading-tight max-w-3xl text-paper mb-6">
           Construyo automatizaciones con IA para negocios reales.
           <br />
           Esto es lo que pasa cuando se ponen en marcha.
         </h1>
         <p className="text-muted text-lg max-w-2xl leading-relaxed mb-10">
-          Nada de teoría genérica: flujos de n8n y Make, agentes de IA para reservas y
-          atención al cliente, y los números reales de tiempo y dinero que ahorran —
-          o de lo que falla cuando algo no sale bien.
+          Nada de teoría genérica: flujos de n8n y Make, agentes de IA para atención al
+          cliente, ventas y tareas administrativas, y los números reales de tiempo y
+          dinero que ahorran — o de lo que falla cuando algo no sale bien.
         </p>
 
         <dl className="grid grid-cols-2 sm:grid-cols-3 gap-8 max-w-2xl">
           <div>
-            <dt className="font-mono text-xs text-muted mb-1">Sector base</dt>
-            <dd className="font-display text-2xl text-paper">Hostelería</dd>
+            <dt className="font-mono text-xs text-muted mb-1">Para quién</dt>
+            <dd className="font-display text-2xl text-paper">Cualquier negocio</dd>
           </div>
           <div>
             <dt className="font-mono text-xs text-muted mb-1">Herramientas</dt>
             <dd className="font-display text-2xl text-paper">n8n · Make · IA</dd>
           </div>
           <div>
-            <dt className="font-mono text-xs text-muted mb-1">Base</dt>
-            <dd className="font-display text-2xl text-paper">Mallorca</dd>
+            <dt className="font-mono text-xs text-muted mb-1">Con qué</dt>
+            <dd className="font-display text-2xl text-paper">Casos y números reales</dd>
           </div>
         </dl>
       </section>

@@ -12,9 +12,11 @@ export default function SobreMi() {
 
       <div className="prose-log text-paper">
         <p>
-          Soy Miquel, desarrollador autodidacta desde Mallorca. Aprendí a programar por mi
-          cuenta y ahora construyo webs, automatizaciones y agentes de IA para negocios
-          reales — sobre todo en hostelería, que es un sector que conozco de primera mano.
+          Soy desarrollador autodidacta. Aprendí a programar por mi cuenta y ahora
+          construyo webs, automatizaciones y agentes de IA para negocios reales de
+          cualquier sector — hostelería, retail, clínicas, inmobiliarias, servicios
+          profesionales, ecommerce. Si hay una tarea repetitiva que se puede convertir
+          en un flujo, la automatizo.
         </p>
         <p>
           Este sitio es un cuaderno de bitácora, no un curso ni un escaparate de agencia.

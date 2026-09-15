@@ -5,10 +5,16 @@ excerpt: "Reservas, horarios y preguntas repetidas, contestadas solas las 24 hor
 category: "Caso real"
 ---
 
-**[Nota para ti, Miquel: esta entrada es una plantilla de caso real. Sustituye los
-datos entre corchetes por los de un cliente real de Atenlo (anonimizado si prefieres,
-por ejemplo "un restaurante de Palma de 40 mesas"). Los casos con números concretos
-son los que mejor posicionan y los que nadie más puede copiar, porque son tuyos.]**
+Este es uno de varios casos reales que voy documentando en sectores distintos — este
+es de hostelería, pero la misma arquitectura (agente de IA + WhatsApp Business + una
+fuente de datos que consultar) sirve igual para una clínica que gestiona citas, una
+inmobiliaria que recibe consultas de pisos o cualquier negocio que reciba muchos
+mensajes repetidos por WhatsApp.
+
+**[Nota: sustituye los datos entre corchetes por los de un cliente real, anonimizado
+si prefieres (por ejemplo "un restaurante de 40 mesas"). Los casos con números
+concretos son los que mejor posicionan y los que nadie más puede copiar, porque son
+tuyos.]**
 
 ## El problema
 
@@ -43,6 +49,6 @@ De la primera reunión al primer flujo funcionando en producción: [X días/sema
 ## Lo que falló a la primera
 
 [Cuenta aquí algo que no funcionó bien al principio — por ejemplo, el agente
-confirmaba reservas sin comprobar el aforo real, o no entendía bien las preguntas en
-mallorquín/catalán. La honestidad aquí es lo que diferencia esta entrada de cualquier
-guía genérica de n8n.]
+confirmaba reservas sin comprobar el aforo real, o no entendía bien preguntas escritas
+en un idioma o dialecto local concreto. La honestidad aquí es lo que diferencia esta
+entrada de cualquier guía genérica de n8n.]
