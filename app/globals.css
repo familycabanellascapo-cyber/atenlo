@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #12151a;
+  color: #EDEDE7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* visible keyboard focus everywhere */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #e8a33d;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.prose-log p {
+  margin-bottom: 1.25rem;
+  line-height: 1.75;
+}
+
+.prose-log h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: #EDEDE7;
+}
+
+.prose-log h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: #EDEDE7;
+}
+
+.prose-log ul,
+.prose-log ol {
+  margin: 1rem 0 1.5rem 1.25rem;
+  line-height: 1.75;
+}
+
+.prose-log li {
+  margin-bottom: 0.4rem;
+}
+
+.prose-log code {
+  font-family: var(--font-mono);
+  background: #1c2027;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.prose-log pre {
+  font-family: var(--font-mono);
+  background: #1c2027;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border: 1px solid #2a2f38;
+}
+
+.prose-log a {
+  color: #e8a33d;
+  text-underline-offset: 3px;
+}
+
+.prose-log blockquote {
+  border-left: 2px solid #4c8c7c;
+  padding-left: 1rem;
+  color: #9ca3af;
+  margin: 1.5rem 0;
+}

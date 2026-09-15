@@ -1,0 +1,4 @@
+# Sustituye pub-0000000000000000 por tu ID real de editor de AdSense
+# una vez tengas la cuenta aprobada. Sin esto, muchos anunciantes no pujan
+# por tu inventario.
+google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
