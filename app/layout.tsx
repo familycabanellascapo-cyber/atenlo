@@ -36,6 +36,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9172118549516539"
+          crossOrigin="anonymous"
+        ></script>
+      </head>
       <body className="font-body bg-ink text-paper min-h-screen flex flex-col antialiased">
         <Header />
         <main className="flex-1">{children}</main>
