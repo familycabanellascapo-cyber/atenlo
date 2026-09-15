@@ -1,6 +1,6 @@
 ---
 title: "¿Vale la pena automatizar tu negocio? Guía completa con ejemplos y números reales"
-date: "2026-09-18"
+date: "2026-09-22"
 excerpt: "La guía definitiva para decidir si automatizar tu negocio compensa: criterios reales, cómo calcular el ahorro, ejemplos por sector, pasos concretos y los mitos que frenan a la gente."
 category: "Guía"
 ---
@@ -223,9 +223,11 @@ solución combina las dos cosas.
 
 Documento cada flujo que monto en este cuaderno de bitácora — con lo que costó, cuánto
 ahorra de verdad y qué falló a la primera. Puedes ver un caso concreto en
-[cómo monté un agente de IA que responde WhatsApp](/blog/agente-ia-whatsapp-restaurante)
-o leer [cuándo uso n8n y cuándo uso Make](/blog/n8n-vs-make-cuando-elegir-cada-uno) si
-ya tienes claro que quieres automatizar algo y te falta decidir con qué herramienta.
+[cómo monté un agente de IA que responde WhatsApp](/blog/agente-ia-whatsapp-restaurante),
+leer [cuándo uso n8n y cuándo uso Make](/blog/n8n-vs-make-cuando-elegir-cada-uno) si ya
+tienes claro que quieres automatizar algo y te falta decidir con qué herramienta, o
+entender [por qué documento todo esto en abierto](/blog/por-que-documento-en-abierto)
+si quieres saber qué hay detrás de este sitio.
 
 Si quieres que miremos juntos si una tarea concreta de tu negocio vale la pena
 automatizarla, escríbeme desde [contacto](/contacto) — no cuesta nada preguntarlo.
