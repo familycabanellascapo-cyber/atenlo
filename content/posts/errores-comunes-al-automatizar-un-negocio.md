@@ -1,6 +1,6 @@
 ---
 title: "Errores comunes al automatizar un negocio (y cómo evitarlos)"
-date: "2026-09-15"
+date: "2026-09-08"
 excerpt: "La mayoría de automatizaciones que fallan no fallan por la herramienta, sino por estos errores de diseño que se repiten en cualquier sector — y cómo evitarlos."
 category: "Guía"
 ---

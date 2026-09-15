@@ -1,6 +1,6 @@
 ---
 title: "¿Cuánto cuesta automatizar un negocio? Rangos reales y de qué depende"
-date: "2026-09-15"
+date: "2026-09-11"
 excerpt: "\"Depende\" es la respuesta honesta, pero poco útil. Aquí tienes los rangos orientativos según el modelo (hazlo tú, freelance o agencia) y de qué depende el precio final."
 category: "Guía"
 ---

@@ -1,6 +1,6 @@
 ---
 title: "Por qué documento en abierto las automatizaciones que hago"
-date: "2026-09-10"
+date: "2026-08-26"
 excerpt: "No es un curso ni una web de agencia. Es el registro real de cada automatización que monto, con números, con lo que falla y con enlaces a los casos completos."
 category: "Diario"
 ---

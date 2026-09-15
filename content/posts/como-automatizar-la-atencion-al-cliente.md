@@ -1,6 +1,6 @@
 ---
 title: "Cómo automatizar la atención al cliente de tu negocio"
-date: "2026-09-15"
+date: "2026-09-13"
 excerpt: "Qué tareas de atención al cliente merece la pena automatizar, por qué canal empezar y cómo hacerlo sin que tus clientes noten que hablan con un sistema en los casos que importan."
 category: "Guía"
 ---

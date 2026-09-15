@@ -1,6 +1,6 @@
 ---
 title: "n8n vs Make: cuándo uso cada uno"
-date: "2026-09-14"
+date: "2026-09-02"
 excerpt: "No es una guerra de herramientas. Es qué encaja mejor según el negocio y el tipo de flujo — con tabla comparativa y casos concretos."
 category: "Técnica"
 ---

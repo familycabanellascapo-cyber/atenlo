@@ -1,6 +1,6 @@
 ---
 title: "¿Qué es un agente de IA y cómo puede ayudar a tu negocio?"
-date: "2026-09-15"
+date: "2026-09-05"
 excerpt: "Ni es un chatbot con otro nombre ni magia sin límites. Qué es exactamente un agente de IA, en qué se diferencia de la automatización clásica y para qué sirve en un negocio real."
 category: "Guía"
 ---

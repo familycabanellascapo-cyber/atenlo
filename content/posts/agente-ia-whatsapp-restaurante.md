@@ -1,6 +1,6 @@
 ---
 title: "Así monto un agente de IA que responde WhatsApp: ejemplo con un restaurante"
-date: "2026-09-12"
+date: "2026-08-29"
 excerpt: "Reservas, horarios y preguntas repetidas, contestadas solas las 24 horas con un agente de IA en WhatsApp Business. Ejemplo completo de cómo funciona por dentro y lo que suele ahorrar."
 category: "Ejemplo"
 ---
