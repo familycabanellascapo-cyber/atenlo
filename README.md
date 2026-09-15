@@ -53,17 +53,17 @@ o bórralos cuando tengas contenido propio.
 
 ## Subir a GitHub
 
+Este proyecto ya viene con git inicializado y un primer commit hecho. Solo te falta
+crear el repositorio en GitHub y conectarlo:
+
 ```bash
-git init
-git add .
-git commit -m "Primera versión del sitio"
 git branch -M main
 git remote add origin https://github.com/TU-USUARIO/TU-REPO.git
 git push -u origin main
 ```
 
 (Crea antes el repositorio vacío en GitHub — sin README ni licencia, para no chocar
-con este commit.)
+con el commit que ya trae este proyecto.)
 
 ## Desplegar en Vercel
 
