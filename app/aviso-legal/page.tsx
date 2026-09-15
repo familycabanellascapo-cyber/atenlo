@@ -16,10 +16,10 @@ export default function AvisoLegal() {
         </p>
         <h2>Titular del sitio</h2>
         <ul>
-          <li>Nombre / razón social: [tu nombre o el de tu autónomo]</li>
-          <li>NIF: [tu NIF]</li>
-          <li>Domicilio: [tu dirección o la de tu actividad]</li>
-          <li>Correo de contacto: [tu correo]</li>
+          <li>Nombre / razón social: Miquel Cabanellas Capó</li>
+          <li>NIF: 49484431-T</li>
+          <li>Domicilio: Calle Mayor, 21, Palma de Mallorca (Illes Balears)</li>
+          <li>Correo de contacto: mikiarkanz@gmail.com</li>
         </ul>
         <h2>Objeto</h2>
         <p>

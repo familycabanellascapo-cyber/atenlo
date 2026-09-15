@@ -14,7 +14,7 @@ export default function PoliticaPrivacidad() {
           actives realmente (AdSense, formulario de contacto, analítica).
         </p>
         <h2>Responsable del tratamiento</h2>
-        <p>[tu nombre o el de tu autónomo] · [tu correo de contacto]</p>
+        <p>Miquel Cabanellas Capó · mikiarkanz@gmail.com</p>
         <h2>¿Qué datos se recogen?</h2>
         <p>
           Si escribes por el formulario o correo de contacto: tu nombre y correo
@@ -30,7 +30,7 @@ export default function PoliticaPrivacidad() {
         <h2>Tus derechos</h2>
         <p>
           Puedes ejercer tus derechos de acceso, rectificación, supresión y oposición
-          escribiendo a [tu correo de contacto].
+          escribiendo a mikiarkanz@gmail.com.
         </p>
       </div>
     </div>
