@@ -1,28 +1,25 @@
 ---
-title: "Cómo monté un agente de IA que responde WhatsApp para un restaurante"
-date: "2026-09-20"
-excerpt: "Reservas, horarios y preguntas repetidas, contestadas solas las 24 horas con un agente de IA en WhatsApp Business. Esto fue lo que tardó, cómo funciona por dentro y lo que ahorra de verdad."
-category: "Caso real"
+title: "Así monto un agente de IA que responde WhatsApp: ejemplo con un restaurante"
+date: "2026-09-12"
+excerpt: "Reservas, horarios y preguntas repetidas, contestadas solas las 24 horas con un agente de IA en WhatsApp Business. Ejemplo completo de cómo funciona por dentro y lo que suele ahorrar."
+category: "Ejemplo"
 ---
 
-Este es uno de varios casos reales que voy documentando en sectores distintos — este
-es de hostelería, pero la misma arquitectura (agente de IA + WhatsApp Business + una
-fuente de datos que consultar) sirve igual para una clínica que gestiona citas, una
+Este es un ejemplo ilustrativo de cómo estructuro este tipo de flujo — no es un
+cliente concreto, sino las cifras y decisiones típicas que suelo encontrarme al montar
+algo así. En cuanto documente un caso real con un negocio concreto, lo publicaré aparte
+con sus propios números. La arquitectura de fondo (agente de IA + WhatsApp Business +
+una fuente de datos que consultar) sirve igual para una clínica que gestiona citas, una
 inmobiliaria que recibe consultas de pisos o cualquier negocio que reciba muchos
 mensajes repetidos por WhatsApp.
 
-**[Nota: sustituye los datos entre corchetes por los de un cliente real, anonimizado
-si prefieres (por ejemplo "un restaurante de 40 mesas"). Los casos con números
-concretos son los que mejor posicionan y los que nadie más puede copiar, porque son
-tuyos.]**
-
 ## El problema
 
-[Nombre o descripción del negocio] recibía de media [X] mensajes de WhatsApp al día
-preguntando por horarios, disponibilidad de mesa y el menú del día. Alguien del
-personal tenía que dejar lo que estaba haciendo para contestar, muchas veces en plena
-hora de servicio — el peor momento posible para que alguien se pare a escribir un
-mensaje.
+Un restaurante de tamaño medio, de unas 40 mesas, recibía de media unos 35 mensajes de
+WhatsApp al día preguntando por horarios, disponibilidad de mesa y el menú del día.
+Alguien del personal tenía que dejar lo que estaba haciendo para contestar, muchas
+veces en plena hora de servicio — el peor momento posible para que alguien se pare a
+escribir un mensaje.
 
 Es un patrón que se repite en casi cualquier negocio con atención al cliente por
 WhatsApp: la mayoría de mensajes que entran son variaciones de las mismas 4 o 5
@@ -83,21 +80,24 @@ datos que consultar.
 
 ## Cuánto tardó
 
-De la primera reunión al primer flujo funcionando en producción: [X días/semanas].
+De la primera reunión al primer flujo funcionando en producción: unas dos semanas,
+contando las pruebas con casos reales antes de ponerlo en marcha del todo.
 
 ## El resultado, con números
 
-- Mensajes gestionados sin intervención humana: [X]% del total
-- Tiempo de personal liberado a la semana: [X] horas
-- Ahorro estimado al mes: [X] € (puedes calcularlo con la
+- Mensajes gestionados sin intervención humana: alrededor del 75% del total
+- Tiempo de personal liberado a la semana: unas 6 horas
+- Ahorro estimado al mes: unos 380 € (puedes calcularlo con tus propios números en la
   [calculadora de ahorro](/herramientas/ahorro-automatizacion))
 
 ## Lo que falló a la primera
 
-[Cuenta aquí algo que no funcionó bien al principio — por ejemplo, el agente
-confirmaba reservas sin comprobar el aforo real, o no entendía bien preguntas escritas
-en un idioma o dialecto local concreto. La honestidad aquí es lo que diferencia esta
-entrada de cualquier guía genérica de n8n.]
+Al principio, el agente confirmaba una reserva en cuanto encontraba un hueco en el
+horario general, sin comprobar el aforo real de esa franja concreta — así que hubo un
+par de noches con más mesas confirmadas de las que había disponibles. Se corrigió
+añadiendo una consulta de disponibilidad en tiempo real justo antes de confirmar nada,
+en vez de fiarse de un horario fijo. Es el tipo de fallo que solo se ve montando el
+flujo de verdad, no leyendo un tutorial.
 
 ## Por qué esta arquitectura sirve para más que un restaurante
 

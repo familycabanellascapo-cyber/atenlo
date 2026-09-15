@@ -1,6 +1,6 @@
 ---
 title: "¿Vale la pena automatizar tu negocio? Guía completa con ejemplos y números reales"
-date: "2026-09-22"
+date: "2026-09-15"
 excerpt: "La guía definitiva para decidir si automatizar tu negocio compensa: criterios reales, cómo calcular el ahorro, ejemplos por sector, pasos concretos y los mitos que frenan a la gente."
 category: "Guía"
 ---

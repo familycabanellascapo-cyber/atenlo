@@ -1,6 +1,6 @@
 ---
 title: "Por qué documento en abierto las automatizaciones que hago"
-date: "2026-09-19"
+date: "2026-09-10"
 excerpt: "No es un curso ni una web de agencia. Es el registro real de cada automatización que monto, con números, con lo que falla y con enlaces a los casos completos."
 category: "Diario"
 ---
@@ -69,17 +69,20 @@ Cada artículo lleva una categoría, para que sepas qué esperar antes de abrir 
 
 - **Diario** — reflexiones sobre cómo y por qué documento este trabajo, como esta
   misma entrada
-- **Caso real** — un flujo concreto que he montado, con el problema, la solución, lo
-  que tardó y lo que falló, como
-  [el agente de IA para WhatsApp de un restaurante](/blog/agente-ia-whatsapp-restaurante)
+- **Caso real** — un flujo concreto que he montado para un negocio real, con el
+  problema, la solución, lo que tardó y lo que falló, y sus números propios
+- **Ejemplo** — una explicación completa de cómo suelo estructurar un tipo de flujo,
+  con cifras orientativas en vez de datos de un cliente concreto, como
+  [el ejemplo del agente de IA para WhatsApp en un restaurante](/blog/agente-ia-whatsapp-restaurante)
 - **Técnica** — comparativas y decisiones de herramientas, como
   [n8n vs Make: cuándo uso cada uno](/blog/n8n-vs-make-cuando-elegir-cada-uno)
 - **Guía** — contenido de referencia más general, como
   [¿vale la pena automatizar tu negocio?](/blog/vale-la-pena-automatizar-mi-negocio)
 
-Así, si solo te interesan los casos con números reales, vas directo a "Caso real"; si
-quieres criterio para decidir herramienta, vas a "Técnica"; y si todavía estás
-decidiendo si merece la pena automatizar algo, empiezas por "Guía".
+Así, si quieres ver un flujo explicado de principio a fin, vas a "Ejemplo" o "Caso
+real" según si ya hay un cliente real detrás; si quieres criterio para decidir
+herramienta, vas a "Técnica"; y si todavía estás decidiendo si merece la pena
+automatizar algo, empiezas por "Guía".
 
 ## De dónde viene esta forma de trabajar
 
