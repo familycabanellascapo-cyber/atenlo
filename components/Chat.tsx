@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Client, Lang } from "@/lib/types";
 import MenuView from "./MenuView";
 
-type Msg = { role: "user" | "assistant"; content: string; showMenu?: boolean };
+type Msg = { role: "user" | "assistant"; content: string; showMenu?: boolean; manageUrl?: string };
 
 const suggestions: Record<Lang, string[]> = {
   es: ["¿Qué horario tenéis?", "¿Tenéis platos sin gluten?", "¿Se puede ir con perro?", "¿Dónde estáis?"],
@@ -18,7 +18,8 @@ const ui = {
     privacy: "No compartas datos sensibles.", book: "📅 Reservar mesa", bookTitle: "Pedir reserva",
     name: "Nombre", day: "Día", time: "Hora", people: "Personas", contact: "Teléfono o email",
     notes: "Comentarios (opcional)", submit: "Enviar petición", cancel: "Cancelar",
-    sent: "✅ ¡Petición enviada! El restaurante te contactará para confirmarla. Tu reserva no está confirmada hasta entonces.",
+    sent: "✅ ¡Petición enviada! El restaurante te contactará para confirmarla. Tu reserva no está confirmada hasta entonces.\n\nSi necesitas cancelarla, guarda el enlace de abajo (haz captura o añádelo a favoritos).",
+    manage: "📋 Ver o cancelar mi reserva",
     sentDemo: "✅ (Demo) Así se enviaría la petición al restaurante. En la demo no se envía nada.",
     bookError: "No se pudo enviar. Revisa los datos o llama al restaurante.",
     full: "Lo sentimos, para ese día y turno ya no quedan mesas. Prueba otra hora u otro día, o llama al restaurante.",
@@ -29,7 +30,8 @@ const ui = {
     privacy: "Please don't share sensitive data.", book: "📅 Book a table", bookTitle: "Booking request",
     name: "Name", day: "Day", time: "Time", people: "People", contact: "Phone or email",
     notes: "Comments (optional)", submit: "Send request", cancel: "Cancel",
-    sent: "✅ Request sent! The restaurant will contact you to confirm. Your booking isn't confirmed until then.",
+    sent: "✅ Request sent! The restaurant will contact you to confirm. Your booking isn't confirmed until then.\n\nIf you need to cancel, keep the link below (take a screenshot or bookmark it).",
+    manage: "📋 View or cancel my booking",
     sentDemo: "✅ (Demo) This is how the request would reach the restaurant. Nothing is sent in the demo.",
     bookError: "Couldn't send it. Check the details or call the restaurant.",
     full: "Sorry, there are no tables left for that day and service. Try another time or day, or call the restaurant.",
@@ -40,7 +42,8 @@ const ui = {
     privacy: "Bitte keine sensiblen Daten teilen.", book: "📅 Tisch reservieren", bookTitle: "Reservierungsanfrage",
     name: "Name", day: "Tag", time: "Uhrzeit", people: "Personen", contact: "Telefon oder E-Mail",
     notes: "Anmerkungen (optional)", submit: "Anfrage senden", cancel: "Abbrechen",
-    sent: "✅ Anfrage gesendet! Das Restaurant meldet sich zur Bestätigung. Bis dahin ist die Reservierung nicht bestätigt.",
+    sent: "✅ Anfrage gesendet! Das Restaurant meldet sich zur Bestätigung. Bis dahin ist die Reservierung nicht bestätigt.\n\nFalls Sie stornieren müssen, speichern Sie den Link unten (Screenshot oder Lesezeichen).",
+    manage: "📋 Reservierung ansehen oder stornieren",
     sentDemo: "✅ (Demo) So würde die Anfrage beim Restaurant ankommen. In der Demo wird nichts gesendet.",
     bookError: "Senden fehlgeschlagen. Bitte Daten prüfen oder das Restaurant anrufen.",
     full: "Leider sind für diesen Tag und diese Schicht keine Tische mehr frei. Bitte andere Uhrzeit oder anderen Tag wählen oder anrufen.",
@@ -157,6 +160,16 @@ export default function Chat({ slug, name, kind, accent, languages, welcome, dem
           {messages.map((m, i) => (
             <div key={i} className="space-y-2">
               <Bubble role={m.role}>{m.content}</Bubble>
+              {m.manageUrl && (
+                <a
+                  href={m.manageUrl}
+                  target="_blank"
+                  className="ml-1 inline-block rounded-2xl border-2 bg-white px-4 py-3 font-medium shadow-sm"
+                  style={{ borderColor: accent, color: accent }}
+                >
+                  {t.manage} →
+                </a>
+              )}
               {m.showMenu && (
                 <button
                   onClick={() => setMenuOpen(true)}
@@ -200,9 +213,9 @@ export default function Chat({ slug, name, kind, accent, languages, welcome, dem
               accent={accent}
               conversationId={conversationId.current}
               onClose={() => setShowBooking(false)}
-              onSent={(msg) => {
+              onSent={(msg, manageUrl) => {
                 setShowBooking(false);
-                setMessages((m) => [...m, { role: "assistant", content: msg }]);
+                setMessages((m) => [...m, { role: "assistant", content: msg, manageUrl }]);
               }}
             />
           )}
@@ -291,7 +304,7 @@ function BookingForm({
   accent: string;
   conversationId: string | null;
   onClose: () => void;
-  onSent: (msg: string) => void;
+  onSent: (msg: string, manageUrl?: string) => void;
 }) {
   const t = ui[lang];
   const [sending, setSending] = useState(false);
@@ -319,7 +332,7 @@ function BookingForm({
         return;
       }
       if (!res.ok) throw new Error(data.error);
-      onSent(data.demo ? t.sentDemo : t.sent);
+      onSent(data.demo ? t.sentDemo : t.sent, data.manageUrl ?? undefined);
     } catch {
       setErr("error");
     } finally {

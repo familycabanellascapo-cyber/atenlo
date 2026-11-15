@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/panel";
 import { site } from "@/lib/site";
 import type { RestaurantProfile } from "@/lib/types";
 import { inviteOwner, saveRestaurant, saveRestaurantForm } from "../actions";
+import DangerZone from "../DangerZone";
 import RestaurantForm from "../RestaurantForm";
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ msg?: string }> };
@@ -92,6 +93,8 @@ export default async function EditRestaurant({ params, searchParams }: Props) {
           </form>
         </details>
       </div>
+
+      <DangerZone id={r.id} slug={r.slug} name={r.name} active={r.active} />
     </main>
   );
 }

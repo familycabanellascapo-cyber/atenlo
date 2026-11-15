@@ -13,7 +13,7 @@ await db.exec(`
   grant usage on schema public, auth to anon, authenticated;
   grant execute on function auth.uid() to anon, authenticated;
 `);
-for (const f of ["0001_init.sql", "0002_no_secret_key.sql", "0003_leads.sql", "0004_capacity.sql"]) {
+for (const f of ["0001_init.sql", "0002_no_secret_key.sql", "0003_leads.sql", "0004_capacity.sql", "0005_cancel_and_delete.sql"]) {
   await db.exec(readFileSync(new URL(`../supabase/migrations/${f}`, import.meta.url), "utf8"));
 }
 
@@ -81,7 +81,7 @@ await as("authenticated", B, async () => {
 
 await as("authenticated", ADM, async () => {
   check("Admin ve todos los restaurantes", (await rows("select * from public.restaurants")).length === 2);
-  check("Admin ve todas las reservas", (await rows("select * from public.reservations")).length === 2);
+  check("Admin ve todas las reservas", (await rows("select id from public.reservations")).length === 2);
 });
 
 
@@ -97,7 +97,7 @@ await as("anon", null, async () => {
   check("la 2ª pregunta va a la misma conversación", c2 === c1);
   const c3 = (await rows(`select public.log_exchange('${P}', '${c1}', 'es', 'colar', 'no') as id`))[0].id;
   check("no se puede escribir en la conversación de otro local", c3 !== c1);
-  check("reserva válida", (await rows(`select public.create_reservation('${J}', '${c1}', 'Ana', '2026-12-01', '21:00', 4, '600111222', '', 'es') as ok`))[0].ok === true);
+  check("reserva válida", (await rows(`select public.create_reservation('${J}', '${c1}', 'Ana', '2026-12-01', '21:00', 4, '600111222', '', 'es') as ok`))[0].ok);
   check("reserva con datos malos rechazada", await fails_(`select public.create_reservation('${J}', null, '', 'mañana', '21:00', 0, '', '', 'es')`));
   check("reserva en local que no acepta reservas rechazada", await fails_(`select public.create_reservation('${P}', null, 'Ana', '2026-12-01', '21:00', 2, '600111222', '', 'es')`));
   check("anónimo NO puede crear restaurantes", await fails_(`select public.admin_create_restaurant('X', 'x', '{}', '')`));
@@ -126,7 +126,7 @@ await as("anon", null, async () => {
 const lead = (name, phone, email = "") =>
   `select public.create_lead('${name}', 'Bar Sol', 'Bar', 'Palma', '${phone}', '${email}', 'Hola', 'test') as ok`;
 await as("anon", null, async () => {
-  check("anónimo envía una solicitud", (await rows(lead("Toni", "600 111 222", "toni@x.com")))[0].ok === true);
+  check("anónimo envía una solicitud", (await rows(lead("Toni", "600 111 222", "toni@x.com")))[0].ok);
   check("solicitud sin teléfono válido rechazada", await fails_(lead("Toni", "12")));
   check("solicitud con email raro rechazada", await fails_(lead("Toni", "600111222", "no-es-email")));
   check("anónimo NO puede leer solicitudes", await fails_("select * from public.leads"));
@@ -148,23 +148,50 @@ await db.exec(`insert into public.restaurants (id, slug, name, profile) values
 const book = (people, time, day = "2026-12-20") =>
   `select public.create_reservation('${C}', null, 'Cliente', '${day}', '${time}', ${people}, '600111222', '', 'es') as ok`;
 await as("anon", null, async () => {
-  check("cena: 1ª reserva (4 pers.) entra", (await rows(book(4, "21:00")))[0].ok === true);
-  check("cena: 2ª reserva (3 pers.) entra", (await rows(book(3, "21:30")))[0].ok === true);
+  check("cena: 1ª reserva (4 pers.) entra", (await rows(book(4, "21:00")))[0].ok);
+  check("cena: 2ª reserva (3 pers.) entra", (await rows(book(3, "21:30")))[0].ok);
   check("cena: 3ª reserva rechazada, no quedan mesas", await fails_(book(1, "22:00")));
-  check("comida del mismo día sí tiene sitio", (await rows(book(2, "14:00")))[0].ok === true);
+  check("comida del mismo día sí tiene sitio", (await rows(book(2, "14:00")))[0].ok);
   check("grupo más grande que el aforo rechazado", await fails_(book(9, "13:00", "2026-12-21")));
-  check("grupo de 6 ocupa 2 mesas y entra", (await rows(book(6, "13:00", "2026-12-21")))[0].ok === true);
+  check("grupo de 6 ocupa 2 mesas y entra", (await rows(book(6, "13:00", "2026-12-21")))[0].ok);
   check("después del grupo de 6 ya no cabe nadie en esa comida", await fails_(book(1, "13:30", "2026-12-21")));
   check("fecha pasada rechazada", await fails_(book(2, "21:00", "2020-01-01")));
 });
 await db.exec(`update public.reservations set status = 'rejected' where restaurant_id = '${C}' and day = '2026-12-20' and time = '21:30'`);
 await as("anon", null, async () => {
-  check("al rechazar una, vuelve a quedar sitio", (await rows(book(2, "22:00")))[0].ok === true);
+  check("al rechazar una, vuelve a quedar sitio", (await rows(book(2, "22:00")))[0].ok);
 });
 await db.exec(`update public.restaurants set profile = '{"reservations": {"accepted": true}}' where id = '${C}'`);
 await as("anon", null, async () => {
-  check("sin aforo configurado, no hay límite", (await rows(book(50, "21:00")))[0].ok === true);
+  check("sin aforo configurado, no hay límite", (await rows(book(50, "21:00")))[0].ok);
 });
+
+// ───── Cancelar reservas y eliminar locales (0005) ─────
+await db.exec(`update public.restaurants set profile = '{"reservations": {"accepted": true}, "capacity": {"tables": 1}}' where id = '${C}'`);
+let token;
+await as("anon", null, async () => {
+  token = (await rows(book(2, "21:00", "2026-12-28")))[0].ok;
+  check("al reservar se recibe un código de reserva", /^[0-9a-f-]{36}$/.test(token));
+  check("con 1 mesa, la 2ª reserva del turno no entra", await fails_(book(2, "21:30", "2026-12-28")));
+  const r = await rows(`select * from public.get_reservation_by_token('${token}')`);
+  check("con el código se ve la reserva", r.length === 1 && r[0].restaurant_name === "Bar Aforo" && r[0].status === "pending");
+  check("con un código inventado no se ve nada", (await rows("select * from public.get_reservation_by_token(gen_random_uuid())")).length === 0);
+  check("el cliente cancela su reserva", (await rows(`select public.cancel_reservation('${token}') as ok`))[0].ok === true);
+  check("no se puede cancelar dos veces", (await rows(`select public.cancel_reservation('${token}') as ok`))[0].ok === false);
+  check("al cancelar se libera la mesa", !!(await rows(book(2, "21:30", "2026-12-28")))[0].ok);
+  check("anónimo NO puede eliminar locales", await fails_(`select public.admin_delete_restaurant('${C}', 'Bar Aforo')`));
+});
+await as("authenticated", A, async () => {
+  check("el dueño NO ve los códigos de cancelación", await fails_("select cancel_token from public.reservations"));
+  check("el dueño sigue viendo sus reservas", (await rows("select id, name, status from public.reservations")).length >= 1);
+  check("un dueño NO puede eliminar locales", await fails_(`select public.admin_delete_restaurant('${J}', 'Bar Juan')`));
+});
+await as("authenticated", ADM, async () => {
+  check("eliminar exige escribir bien el nombre", await fails_(`select public.admin_delete_restaurant('${C}', 'otro nombre')`));
+  check("admin elimina el local", (await rows(`select public.admin_delete_restaurant('${C}', 'Bar Aforo') as ok`))[0].ok === true);
+});
+check("al eliminar se borran sus reservas", (await rows(`select * from public.reservations where restaurant_id = '${C}'`)).length === 0);
+check("los demás locales siguen intactos", (await rows("select * from public.restaurants where slug in ('bar-juan', 'bar-pepe')")).length === 2);
 
 console.log(fails ? `\n${fails} fallos` : "\nTodo correcto");
 process.exit(fails ? 1 : 0);

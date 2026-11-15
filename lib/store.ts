@@ -43,9 +43,9 @@ export async function createReservation(
   req: ReservationRequest,
   conversationId: string | null,
   lang: string,
-): Promise<"ok" | "full" | "invalid" | "error"> {
-  if (!r.id) return "ok"; // demo: se simula
-  const { error } = await createPublicClient().rpc("create_reservation", {
+): Promise<{ result: "ok" | "full" | "invalid" | "error"; token?: string }> {
+  if (!r.id) return { result: "ok" }; // demo: se simula
+  const { data, error } = await createPublicClient().rpc("create_reservation", {
     p_restaurant: r.id,
     p_conversation: conv(conversationId),
     p_name: req.name,
@@ -57,10 +57,10 @@ export async function createReservation(
     p_lang: lang,
   });
   if (error) {
-    if (error.message.includes("completo")) return "full";
-    if (error.message.includes("no válidos") || error.message.includes("fecha pasada")) return "invalid";
+    if (error.message.includes("completo")) return { result: "full" };
+    if (error.message.includes("no válidos") || error.message.includes("fecha pasada")) return { result: "invalid" };
     console.error("[store] no se pudo guardar la reserva:", error.message);
-    return "error";
+    return { result: "error" };
   }
-  return "ok";
+  return { result: "ok", token: typeof data === "string" ? data : undefined };
 }

@@ -16,7 +16,7 @@ const tabs = [
   ["qr", "QR y enlace"],
 ] as const;
 
-const statusLabel = { pending: "Pendiente", confirmed: "Confirmada", rejected: "Rechazada" } as const;
+const statusLabel = { pending: "Pendiente", confirmed: "Confirmada", rejected: "Rechazada", cancelled: "Cancelada por el cliente" } as const;
 const langLabel: Record<string, string> = { es: "Español", en: "Inglés", de: "Alemán" };
 
 export default async function PanelPage({ searchParams }: { searchParams: SP }) {
@@ -86,7 +86,7 @@ function Shell({ children, email, isAdmin, title }: { children: React.ReactNode;
 async function Inicio({ supabase, restaurantId, monthStart, q }: { supabase: DB; restaurantId: string; monthStart: string; q: (t: string) => string }) {
   const [convs, pending, monthRes] = await Promise.all([
     supabase.from("conversations").select("lang, message_count").eq("restaurant_id", restaurantId).gte("created_at", monthStart),
-    supabase.from("reservations").select("*").eq("restaurant_id", restaurantId).eq("status", "pending").order("created_at", { ascending: false }),
+    supabase.from("reservations").select("id, name, day, time, people, contact, notes, status, created_at").eq("restaurant_id", restaurantId).eq("status", "pending").order("created_at", { ascending: false }),
     supabase.from("reservations").select("id", { count: "exact", head: true }).eq("restaurant_id", restaurantId).gte("created_at", monthStart),
   ]);
   const rows = convs.data ?? [];
@@ -156,10 +156,12 @@ function ReservationList({ items, empty }: { items: Reservation[]; empty: string
               </>
             ) : (
               <>
-                <span className={`rounded-full px-3 py-1 text-sm ${r.status === "confirmed" ? "bg-sea/10 text-sea" : "bg-sand text-muted"}`}>
+                <span className={`rounded-full px-3 py-1 text-sm ${r.status === "confirmed" ? "bg-sea/10 text-sea" : r.status === "cancelled" ? "bg-terra/10 text-terra-dark" : "bg-sand text-muted"}`}>
                   {statusLabel[r.status]}
                 </span>
-                <StatusButton id={r.id} status="pending" className="text-xs text-muted underline">Deshacer</StatusButton>
+                {r.status !== "cancelled" && (
+                  <StatusButton id={r.id} status="pending" className="text-xs text-muted underline">Deshacer</StatusButton>
+                )}
               </>
             )}
           </div>
@@ -191,7 +193,7 @@ async function Reservas({
 }) {
   const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Madrid" });
   const [{ data }, { data: upcoming }] = await Promise.all([
-    supabase.from("reservations").select("*").eq("restaurant_id", restaurantId).order("created_at", { ascending: false }).limit(100),
+    supabase.from("reservations").select("id, name, day, time, people, contact, notes, status, created_at").eq("restaurant_id", restaurantId).order("created_at", { ascending: false }).limit(100),
     supabase.from("reservations").select("day, time, people").eq("restaurant_id", restaurantId)
       .in("status", ["pending", "confirmed"]).gte("day", today).order("day").limit(500),
   ]);

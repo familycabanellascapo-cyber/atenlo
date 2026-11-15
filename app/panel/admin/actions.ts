@@ -130,3 +130,28 @@ export async function saveRestaurantForm(_prev: FormState, formData: FormData): 
   back(`/panel/admin/${slug}`, "Guardado ✓");
   return {};
 }
+
+/** Elimina un local y todo lo suyo. Exige escribir su nombre exacto para confirmar. */
+export async function deleteRestaurant(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const slug = String(formData.get("slug"));
+  const confirm = String(formData.get("confirm") ?? "").trim();
+  const { error } = await supabase.rpc("admin_delete_restaurant", { p_id: String(formData.get("id")), p_confirm_name: confirm });
+  if (error) back(`/panel/admin/${slug}`, error.message.includes("no coincide") ? "No se ha eliminado: el nombre no coincide." : `Error: ${error.message}`);
+  revalidatePath("/panel/admin");
+  back("/panel/admin", `🗑️ "${confirm}" eliminado. Su chat, su carta y sus QR ya no funcionan.`);
+}
+
+/** Pausar / reactivar (por ejemplo, si deja de pagar). Se puede deshacer. */
+export async function setRestaurantActive(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const slug = String(formData.get("slug"));
+  const active = formData.get("active") === "on";
+  const { data: r } = await supabase.from("restaurants").select("id, name, profile, notify_email").eq("slug", slug).single();
+  if (!r) back("/panel/admin", "No encontrado.");
+  const { error } = await supabase.rpc("admin_update_restaurant", {
+    p_id: r!.id, p_name: r!.name, p_profile: r!.profile, p_notify_email: r!.notify_email ?? "", p_active: active,
+  });
+  revalidatePath("/panel/admin");
+  back(`/panel/admin/${slug}`, error ? `Error: ${error.message}` : active ? "▶️ Reactivado: su chat vuelve a funcionar." : "⏸️ Pausado: su chat y su carta no funcionan hasta que lo reactives.");
+}
