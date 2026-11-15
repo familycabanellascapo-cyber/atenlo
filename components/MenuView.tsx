@@ -47,6 +47,7 @@ export default function MenuView({
   initialLang,
   onClose,
   chatHref,
+  logo,
 }: {
   name: string;
   kind?: string;
@@ -56,6 +57,7 @@ export default function MenuView({
   initialLang: Lang;
   onClose?: () => void;
   chatHref?: string;
+  logo?: string;
 }) {
   const [lang, setLang] = useState<Lang>(initialLang);
   const [hide, setHide] = useState<Allergen[]>([]);
@@ -92,6 +94,10 @@ export default function MenuView({
             </button>
           )}
         </div>
+        {logo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logo} alt="" className="mx-auto mb-4 size-20 rounded-2xl bg-white object-contain p-1 shadow-sm" />
+        )}
         <p className="text-xs tracking-[0.3em] uppercase opacity-80">{kind}</p>
         <h1 className="mt-2 font-display text-4xl font-semibold">{name}</h1>
         <div className="mx-auto mt-4 flex max-w-[200px] items-center gap-3 opacity-80">

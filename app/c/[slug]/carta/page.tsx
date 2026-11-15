@@ -32,6 +32,7 @@ export default async function CartaPage({ params, searchParams }: Props) {
       languages={c.languages}
       initialLang={lang}
       chatHref={`/c/${c.slug}`}
+      logo={c.logo}
     />
   );
 }

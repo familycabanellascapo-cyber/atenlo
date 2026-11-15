@@ -1,12 +1,13 @@
 import Link from "next/link";
 import ContactButton from "./ContactButton";
+import Logo from "./Logo";
 
 export default function Header() {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-cream/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
-        <Link href="/" className="font-display text-xl font-semibold tracking-tight">
-          ATENLO<span className="text-terra">.</span>
+        <Link href="/" aria-label="ATENLO, inicio" className="shrink-0">
+          <Logo compact />
         </Link>
         <nav className="flex items-center gap-3 text-sm sm:gap-5">
           <a href="/#como-funciona" className="hidden text-muted hover:text-ink md:inline">Cómo funciona</a>

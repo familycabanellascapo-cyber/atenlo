@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import QRCode from "qrcode";
 import { requireAdmin } from "@/lib/panel";
-import { inviteOwner, saveRestaurant } from "../actions";
+import { site } from "@/lib/site";
+import type { RestaurantProfile } from "@/lib/types";
+import { inviteOwner, saveRestaurant, saveRestaurantForm } from "../actions";
+import RestaurantForm from "../RestaurantForm";
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ msg?: string }> };
 
@@ -11,55 +15,82 @@ export default async function EditRestaurant({ params, searchParams }: Props) {
   const { supabase } = await requireAdmin();
   const { data: r } = await supabase.from("restaurants").select("*").eq("slug", slug).maybeSingle();
   if (!r) notFound();
+  const profile = r.profile as RestaurantProfile;
 
+  const chatUrl = `${site.url}/c/${r.slug}`;
+  const menuUrl = `${chatUrl}/carta`;
+  const qr = await QRCode.toDataURL(chatUrl, { width: 800, margin: 2, color: { dark: "#1c1917", light: "#ffffff" } });
+  const qrMenu = await QRCode.toDataURL(menuUrl, { width: 800, margin: 2, color: { dark: "#1c1917", light: "#ffffff" } });
   const field = "mt-1 w-full rounded-xl border border-line bg-white px-3 py-2 outline-none focus:border-ink";
+
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <main className="mx-auto max-w-3xl px-4 py-8">
       <Link href="/panel/admin" className="text-sm text-muted hover:text-ink">← Administración</Link>
-      <div className="mt-4 mb-6 flex flex-wrap items-baseline justify-between gap-3">
-        <h1 className="font-display text-3xl font-semibold">{r.name}</h1>
-        <a href={`/c/${r.slug}`} target="_blank" className="text-sm text-terra underline">Abrir su chat ↗</a>
+      <div className="mt-4 mb-6 flex items-center gap-4">
+        {profile.logo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={profile.logo} alt="" className="size-14 rounded-2xl border border-line bg-white object-contain" />
+        ) : (
+          <span className="flex size-14 items-center justify-center rounded-2xl font-display text-2xl text-white" style={{ background: profile.accent }}>
+            {r.name.charAt(0)}
+          </span>
+        )}
+        <div>
+          <h1 className="font-display text-3xl font-semibold">{r.name}</h1>
+          <p className={`text-sm ${r.active ? "text-sea" : "text-muted"}`}>{r.active ? "● Publicado" : "○ No publicado"}</p>
+        </div>
       </div>
       {msg && <p className="mb-6 rounded-xl bg-sand p-3 text-sm">{msg}</p>}
 
-      <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
-        <form action={saveRestaurant} className="space-y-4">
+      {/* QR y enlaces listos para entregar */}
+      <section className="mb-10 rounded-3xl border border-line bg-white p-5 sm:p-6">
+        <h2 className="mb-4 font-semibold">QR y enlaces para el restaurante</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          {[
+            { label: "💬 Chat (asistente + reservas)", url: chatUrl, png: qr, file: `atenlo-qr-chat-${r.slug}.png` },
+            { label: "📖 Carta digital", url: menuUrl, png: qrMenu, file: `atenlo-qr-carta-${r.slug}.png` },
+          ].map((x) => (
+            <div key={x.url} className="space-y-3">
+              <p className="text-sm font-medium">{x.label}</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={x.png} alt={`QR de ${x.url}`} className="w-40 rounded-xl border border-line" />
+              <a href={x.url} target="_blank" className="block font-mono text-xs break-all text-terra underline">{x.url}</a>
+              <div className="flex gap-2">
+                <a href={x.png} download={x.file} className="rounded-full bg-ink px-4 py-2 text-xs font-medium text-cream">Descargar QR</a>
+                <a href={x.url} target="_blank" className="rounded-full border border-line px-4 py-2 text-xs font-medium">Abrir ↗</a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <RestaurantForm
+        mode="edit"
+        action={saveRestaurantForm}
+        initial={{ id: r.id, name: r.name, slug: r.slug, notify_email: r.notify_email, active: r.active, profile }}
+      />
+
+      <div className="mt-10 grid gap-6 sm:grid-cols-2">
+        <form action={inviteOwner} className="space-y-3 rounded-2xl border border-line bg-white p-4 text-sm">
           <input type="hidden" name="id" value={r.id} />
           <input type="hidden" name="slug" value={r.slug} />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm">
-              Nombre
-              <input name="name" defaultValue={r.name} className={field} />
-            </label>
-            <label className="block text-sm">
-              Email de contacto
-              <input name="notify_email" type="email" defaultValue={r.notify_email ?? ""} className={field} />
-            </label>
-          </div>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="active" defaultChecked={r.active} /> Activo (si lo desactivas, su chat deja de funcionar)
-          </label>
-          <label className="block text-sm">
-            Ficha completa (JSON): carta, alérgenos, horario, información…
-            <textarea name="profile" rows={28} defaultValue={JSON.stringify(r.profile, null, 2)} className={`${field} font-mono text-xs`} spellCheck={false} />
-          </label>
-          <button className="rounded-full bg-ink px-6 py-3 font-medium text-cream">Guardar</button>
+          <p className="font-semibold">Dar acceso a un dueño</p>
+          <input name="email" type="email" required placeholder="email@ejemplo.com" className={field} />
+          <button className="w-full rounded-full border border-ink py-2 font-medium">Dar acceso</button>
         </form>
 
-        <aside className="space-y-6 text-sm">
-          <form action={inviteOwner} className="space-y-3 rounded-2xl border border-line bg-white p-4">
+        <details className="rounded-2xl border border-line bg-white p-4 text-sm">
+          <summary className="cursor-pointer font-semibold">Avanzado: editar la ficha en JSON</summary>
+          <form action={saveRestaurant} className="mt-3 space-y-3">
             <input type="hidden" name="id" value={r.id} />
             <input type="hidden" name="slug" value={r.slug} />
-            <p className="font-semibold">Dar acceso a un dueño</p>
-            <input name="email" type="email" required placeholder="email@ejemplo.com" className={field} />
-            <button className="w-full rounded-full border border-ink py-2 font-medium">Invitar</button>
+            <input type="hidden" name="name" value={r.name} />
+            <input type="hidden" name="notify_email" value={r.notify_email ?? ""} />
+            {r.active && <input type="hidden" name="active" value="on" />}
+            <textarea name="profile" rows={14} defaultValue={JSON.stringify({ ...profile, logo: profile.logo ? "(se mantiene)" : undefined }, null, 2)} className={`${field} font-mono text-xs`} spellCheck={false} />
+            <button className="rounded-full bg-ink px-4 py-2 font-medium text-cream">Guardar JSON</button>
           </form>
-          <div className="space-y-2 rounded-2xl bg-sand p-4 text-muted">
-            <p className="font-semibold text-ink">Alérgenos válidos</p>
-            <p className="font-mono text-xs">gluten, crustaceos, huevo, pescado, cacahuete, soja, lacteos, frutos_secos, apio, mostaza, sesamo, sulfitos, altramuces, moluscos</p>
-            <p>Usa la ficha de la demo (<code>lib/clients/demo.ts</code>) como ejemplo. Los alérgenos los confirma SIEMPRE el restaurante.</p>
-          </div>
-        </aside>
+        </details>
       </div>
     </main>
   );

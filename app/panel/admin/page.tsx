@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/panel";
-import { createRestaurant } from "./actions";
 import Leads from "./Leads";
 
 export default async function AdminPage({ searchParams }: { searchParams: Promise<{ msg?: string; leads?: string }> }) {
@@ -46,22 +45,17 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           )}
         </section>
 
-        <form action={createRestaurant} className="space-y-4 rounded-2xl border border-line bg-white p-5">
-          <h2 className="font-semibold">Nuevo restaurante</h2>
-          <label className="block text-sm">
-            Nombre
-            <input name="name" required placeholder="Bar Juan" className={field} />
-          </label>
-          <label className="block text-sm">
-            Dirección web <span className="text-muted">(atenlo.com/c/…)</span>
-            <input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="bar-juan" className={field} />
-          </label>
-          <label className="block text-sm">
-            Email del dueño <span className="text-muted">(con él entrará en su panel)</span>
-            <input name="owner" type="email" placeholder="juan@ejemplo.com" className={field} />
-          </label>
-          <button className="w-full rounded-full bg-ink py-2.5 font-medium text-cream">Crear</button>
-        </form>
+        <div className="space-y-4">
+          <Link
+            href="/panel/admin/nuevo"
+            className="block rounded-2xl bg-terra p-5 text-center font-medium text-white hover:bg-terra-dark"
+          >
+            ＋ Crear un restaurante nuevo
+          </Link>
+          <p className="text-sm text-muted">
+            Rellenas sus datos, carta y logo, y al momento tiene su chat, su carta digital y sus QR listos para entregar.
+          </p>
+        </div>
       </div>
     </main>
   );

@@ -21,6 +21,7 @@ export type Client = {
   kind: string; // "Restaurante", "Bar de tapas"...
   languages: Lang[];
   accent: string; // color de marca del local (hex)
+  logo?: string; // logo del local (imagen pequeña en data URL: png/jpeg/webp)
   welcome: Record<Lang, string>;
   contact: {
     address: string;

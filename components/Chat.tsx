@@ -58,9 +58,10 @@ type Props = {
   demo?: boolean;
   reservations: boolean;
   menu: Client["menu"];
+  logo?: string;
 };
 
-export default function Chat({ slug, name, kind, accent, languages, welcome, demo, reservations, menu }: Props) {
+export default function Chat({ slug, name, kind, accent, languages, welcome, demo, reservations, menu, logo }: Props) {
   const [lang, setLang] = useState<Lang>(languages[0]);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -117,9 +118,15 @@ export default function Chat({ slug, name, kind, accent, languages, welcome, dem
     <div className="flex h-dvh flex-col bg-cream">
       <header className="px-4 py-3 text-white" style={{ background: accent }}>
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
-          <div className="min-w-0">
+          <div className="flex min-w-0 items-center gap-3">
+            {logo && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logo} alt="" className="size-10 shrink-0 rounded-xl bg-white object-contain p-0.5" />
+            )}
+            <div className="min-w-0">
             <h1 className="truncate font-display text-lg font-semibold">{name}</h1>
             <p className="truncate text-xs opacity-85">{kind}</p>
+            </div>
           </div>
           {languages.length > 1 && (
             <div className="flex shrink-0 gap-1" role="group" aria-label="Idioma">
@@ -267,6 +274,7 @@ export default function Chat({ slug, name, kind, accent, languages, welcome, dem
             menu={menu}
             languages={languages}
             initialLang={lang}
+            logo={logo}
             onClose={() => setMenuOpen(false)}
           />
         </div>

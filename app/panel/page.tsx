@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import QRCode from "qrcode";
 import { allergenNames } from "@/lib/knowledge";
 import { currentRestaurant } from "@/lib/panel";
@@ -66,7 +67,7 @@ function Shell({ children, email, isAdmin, title }: { children: React.ReactNode;
     <>
       <header className="border-b border-line">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
-          <Link href="/panel" className="font-display text-xl font-semibold">ATENLO<span className="text-terra">.</span></Link>
+          <Link href="/panel" aria-label="Panel"><Logo /></Link>
           <div className="flex items-center gap-4 text-sm text-muted">
             {isAdmin && <Link href="/panel/admin" className="font-medium text-terra hover:underline">Administración</Link>}
             <span className="hidden sm:inline">{email}</span>
