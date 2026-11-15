@@ -29,6 +29,7 @@ export default async function ClientChatPage({ params }: Props) {
       welcome={c.welcome}
       demo={c.demo}
       reservations={c.reservations.accepted}
+      menu={c.menu}
     />
   );
 }

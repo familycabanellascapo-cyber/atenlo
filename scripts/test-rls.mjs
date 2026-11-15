@@ -13,7 +13,7 @@ await db.exec(`
   grant usage on schema public, auth to anon, authenticated;
   grant execute on function auth.uid() to anon, authenticated;
 `);
-for (const f of ["0001_init.sql", "0002_no_secret_key.sql", "0003_leads.sql"]) {
+for (const f of ["0001_init.sql", "0002_no_secret_key.sql", "0003_leads.sql", "0004_capacity.sql"]) {
   await db.exec(readFileSync(new URL(`../supabase/migrations/${f}`, import.meta.url), "utf8"));
 }
 
@@ -140,6 +140,31 @@ await as("authenticated", ADM, async () => {
   check("admin no puede cambiar los datos que envió el cliente", await fails_("update public.leads set phone = '0'"));
 });
 check("admin marcó la solicitud como contactada", (await rows("select status from public.leads"))[0].status === "contacted");
+
+// ───── Aforo (0004): 2 mesas y 8 plazas → 4 personas por mesa ─────
+const C = "30000000-0000-0000-0000-000000000003";
+await db.exec(`insert into public.restaurants (id, slug, name, profile) values
+  ('${C}', 'bar-aforo', 'Bar Aforo', '{"reservations": {"accepted": true}, "capacity": {"tables": 2, "seats": 8}}')`);
+const book = (people, time, day = "2026-12-20") =>
+  `select public.create_reservation('${C}', null, 'Cliente', '${day}', '${time}', ${people}, '600111222', '', 'es') as ok`;
+await as("anon", null, async () => {
+  check("cena: 1ª reserva (4 pers.) entra", (await rows(book(4, "21:00")))[0].ok === true);
+  check("cena: 2ª reserva (3 pers.) entra", (await rows(book(3, "21:30")))[0].ok === true);
+  check("cena: 3ª reserva rechazada, no quedan mesas", await fails_(book(1, "22:00")));
+  check("comida del mismo día sí tiene sitio", (await rows(book(2, "14:00")))[0].ok === true);
+  check("grupo más grande que el aforo rechazado", await fails_(book(9, "13:00", "2026-12-21")));
+  check("grupo de 6 ocupa 2 mesas y entra", (await rows(book(6, "13:00", "2026-12-21")))[0].ok === true);
+  check("después del grupo de 6 ya no cabe nadie en esa comida", await fails_(book(1, "13:30", "2026-12-21")));
+  check("fecha pasada rechazada", await fails_(book(2, "21:00", "2020-01-01")));
+});
+await db.exec(`update public.reservations set status = 'rejected' where restaurant_id = '${C}' and day = '2026-12-20' and time = '21:30'`);
+await as("anon", null, async () => {
+  check("al rechazar una, vuelve a quedar sitio", (await rows(book(2, "22:00")))[0].ok === true);
+});
+await db.exec(`update public.restaurants set profile = '{"reservations": {"accepted": true}}' where id = '${C}'`);
+await as("anon", null, async () => {
+  check("sin aforo configurado, no hay límite", (await rows(book(50, "21:00")))[0].ok === true);
+});
 
 console.log(fails ? `\n${fails} fallos` : "\nTodo correcto");
 process.exit(fails ? 1 : 0);

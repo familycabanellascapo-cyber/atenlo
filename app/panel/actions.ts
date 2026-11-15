@@ -36,6 +36,11 @@ function parseLines(text: string) {
     .slice(0, 40);
 }
 
+function clampInt(v: FormDataEntryValue | null, max: number) {
+  const n = Number.parseInt(String(v ?? ""), 10);
+  return Number.isFinite(n) && n > 0 ? Math.min(n, max) : 0;
+}
+
 export async function updateInfo(formData: FormData) {
   const slug = String(formData.get("slug"));
   const { supabase, restaurant } = await currentRestaurant(slug);
@@ -60,6 +65,10 @@ export async function updateInfo(formData: FormData) {
     hours: hours.length ? hours : old.hours,
     hoursI18n: hoursChanged ? undefined : old.hoursI18n,
     facts,
+    capacity: {
+      tables: clampInt(formData.get("tables"), 500),
+      seats: clampInt(formData.get("seats"), 5000),
+    },
   };
   const notify = String(formData.get("notify_email") ?? "").trim();
 

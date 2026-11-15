@@ -41,6 +41,8 @@ export type Client = {
     accepted: boolean;
     how: string; // ej. "Por teléfono o WhatsApp. Para grupos de más de 8, con 48 h."
   };
+  // Aforo para reservas online, por turno (comida / cena). 0 o vacío = sin límite.
+  capacity?: { tables?: number; seats?: number };
   // A quién avisar cuando el asistente no sabe responder.
   handoff: { name: string; channel: string };
 };

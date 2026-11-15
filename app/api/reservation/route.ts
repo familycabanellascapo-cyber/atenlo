@@ -36,12 +36,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Faltan datos" }, { status: 400 });
   }
 
-  const ok = await createReservation(
+  const result = await createReservation(
     restaurant,
     { name, day, time, people, contact, notes },
     typeof b.conversationId === "string" ? b.conversationId : null,
     lang,
   );
-  if (!ok) return NextResponse.json({ error: "No se pudo enviar" }, { status: 500 });
+  if (result === "full") return NextResponse.json({ error: "full" }, { status: 409 });
+  if (result === "invalid") return NextResponse.json({ error: "Faltan datos" }, { status: 400 });
+  if (result === "error") return NextResponse.json({ error: "No se pudo enviar" }, { status: 500 });
   return NextResponse.json({ ok: true, demo: restaurant.id === null });
 }

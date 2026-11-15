@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { aiAnswer, aiEnabled, type ChatMessage } from "@/lib/ai";
 import { getRestaurant } from "@/lib/clients";
-import { detectLang, fallbackAnswer } from "@/lib/fallback";
+import { detectLang, fallbackAnswer, wantsMenu } from "@/lib/fallback";
 import { clientIp, rateLimited } from "@/lib/ratelimit";
 import { saveExchange } from "@/lib/store";
 
@@ -57,5 +57,5 @@ export async function POST(req: Request) {
   }
 
   const convId = await saveExchange(restaurant, conversationId, lang, last.content, reply);
-  return NextResponse.json({ reply, mode, conversationId: convId });
+  return NextResponse.json({ reply, mode, conversationId: convId, showMenu: wantsMenu(last.content) });
 }

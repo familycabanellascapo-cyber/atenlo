@@ -5,6 +5,10 @@ import type { Allergen, Client, Lang } from "./types";
 
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 const has = (text: string, words: string[]) => words.some((w) => text.includes(norm(w)));
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+// Palabra completa (admite plural): "car" no debe coincidir con "carta".
+const hasWord = (text: string, words: string[]) =>
+  words.some((w) => new RegExp(`(^|[^a-z0-9])${escapeRe(norm(w))}(e?s)?([^a-z0-9]|$)`).test(text));
 
 export function detectLang(text: string): Lang {
   const t = ` ${norm(text).replace(/[^a-z\s]/g, " ")} `;
@@ -25,7 +29,11 @@ const T = {
     de: "Gerne! Tippen Sie unten auf „📅 Tisch reservieren“, das Restaurant bestätigt Ihnen. Oder rufen Sie an:",
   },
   bookNo: { es: "No aceptamos reservas.", en: "We don't take bookings.", de: "Wir nehmen keine Reservierungen an." },
-  menuIntro: { es: "Esta es nuestra carta:", en: "Here's our menu:", de: "Unsere Speisekarte:" },
+  menuIntro: {
+    es: "¡Aquí tienes nuestra carta! 👇 Toca «Ver carta» para verla con precios y alérgenos.",
+    en: "Here's our menu! 👇 Tap “View menu” to see it with prices and allergens.",
+    de: "Hier ist unsere Speisekarte! 👇 Tippen Sie auf „Speisekarte ansehen“ für Preise und Allergene.",
+  },
   free: { es: "Platos sin", en: "Dishes without", de: "Gerichte ohne" },
   noneFree: {
     es: "Según nuestra carta, todos los platos contienen",
@@ -99,7 +107,7 @@ export function fallbackAnswer(c: Client, message: string): string {
   }
 
   // Información práctica
-  const fact = c.facts.find((f) => f.keywords && has(t, f.keywords));
+  const fact = c.facts.find((f) => f.keywords && hasWord(t, f.keywords));
   if (fact) return fact.i18n?.[lang] ?? fact.answer;
 
   // Reservas
@@ -121,13 +129,23 @@ export function fallbackAnswer(c: Client, message: string): string {
 
   // Carta / precios
   if (has(t, ["carta", "menu", "plato", "comer", "precio", "food", "dish", "price", "eat", "speise", "karte", "essen", "preis"])) {
-    return `${T.menuIntro[lang]}\n${c.menu
-      .map((s) => `\n${s.section}\n${s.dishes.map((d) => `• ${d.name}${d.price != null ? ` — ${d.price} €` : ""}`).join("\n")}`)
-      .join("\n")}`;
+    return T.menuIntro[lang];
   }
 
   if (has(t, ["gracias", "thank", "danke"])) return T.thanks[lang];
   if (has(t, ["hola", "buenas", "hello", " hi ", "hey", "hallo", "guten"])) return T.greet[lang];
 
   return `${T.handoff[lang]} ${c.handoff.name} ${T.by[lang]} ${c.handoff.channel}.`;
+}
+
+const MENU_WORDS = ["carta", "menu", "plato", "comer", "precio", "food", "dish", "price", "eat", "speise", "karte", "essen", "preis", "gericht"];
+
+/** ¿La pregunta va de la carta, precios o alérgenos? Entonces el chat enseña el botón "Ver carta". */
+export function wantsMenu(message: string): boolean {
+  const t = ` ${norm(message)} `;
+  return (
+    has(t, MENU_WORDS) ||
+    has(t, ["alerg", "allerg", "intoleran", "unvertrag", "vegan", "vegetar"]) ||
+    (Object.values(allergenWords) as string[][]).some((w) => has(t, w))
+  );
 }

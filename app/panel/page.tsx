@@ -51,7 +51,7 @@ export default async function PanelPage({ searchParams }: { searchParams: SP }) 
       </nav>
 
       {tab === "inicio" && <Inicio supabase={supabase} restaurantId={restaurant.id} monthStart={monthStart} q={q} />}
-      {tab === "reservas" && <Reservas supabase={supabase} restaurantId={restaurant.id} />}
+      {tab === "reservas" && <Reservas supabase={supabase} restaurantId={restaurant.id} capacity={restaurant.profile.capacity} q={q} />}
       {tab === "conversaciones" && <Conversaciones supabase={supabase} restaurantId={restaurant.id} slug={restaurant.slug} />}
       {tab === "info" && <Info restaurant={restaurant} ok={!!sp.ok} error={!!sp.error} />}
       {tab === "qr" && <Qr slug={restaurant.slug} />}
@@ -183,15 +183,68 @@ function formatDay(day: string) {
   return Number.isNaN(d.getTime()) ? day : d.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
 }
 
-async function Reservas({ supabase, restaurantId }: { supabase: DB; restaurantId: string }) {
-  const { data } = await supabase
-    .from("reservations")
-    .select("*")
-    .eq("restaurant_id", restaurantId)
-    .order("created_at", { ascending: false })
-    .limit(100);
+async function Reservas({
+  supabase, restaurantId, capacity, q,
+}: {
+  supabase: DB; restaurantId: string; capacity?: { tables?: number; seats?: number }; q: (t: string) => string;
+}) {
+  const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Madrid" });
+  const [{ data }, { data: upcoming }] = await Promise.all([
+    supabase.from("reservations").select("*").eq("restaurant_id", restaurantId).order("created_at", { ascending: false }).limit(100),
+    supabase.from("reservations").select("day, time, people").eq("restaurant_id", restaurantId)
+      .in("status", ["pending", "confirmed"]).gte("day", today).order("day").limit(500),
+  ]);
+
+  // Ocupación por día y turno (misma cuenta que hace la base de datos al aceptar reservas).
+  const tables = capacity?.tables ?? 0;
+  const seats = capacity?.seats ?? 0;
+  const perTable = tables > 0 && seats > 0 ? Math.max(seats / tables, 1) : 4;
+  const load = new Map<string, { day: string; dinner: boolean; tables: number; people: number }>();
+  for (const r of upcoming ?? []) {
+    const dinner = r.time >= "17:00";
+    const key = `${r.day}|${dinner}`;
+    const cur = load.get(key) ?? { day: r.day, dinner, tables: 0, people: 0 };
+    cur.tables += Math.max(1, Math.ceil(r.people / perTable));
+    cur.people += r.people;
+    load.set(key, cur);
+  }
+  const slots = [...load.values()].slice(0, 14);
+
   return (
     <>
+      <section className="mb-8">
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-sm font-semibold tracking-wide text-muted uppercase">Ocupación próximos días</h2>
+          <Link href={q("info")} className="text-sm text-terra hover:underline">
+            {tables || seats ? `Límite: ${tables ? `${tables} mesas` : ""}${tables && seats ? " · " : ""}${seats ? `${seats} personas` : ""} por turno` : "Configurar mesas y aforo"}
+          </Link>
+        </div>
+        {!slots.length ? (
+          <p className="text-sm text-muted">No hay reservas para los próximos días.</p>
+        ) : (
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {slots.map((sl) => {
+              const pct = Math.max(tables ? sl.tables / tables : 0, seats ? sl.people / seats : 0);
+              const full = (tables > 0 || seats > 0) && pct >= 1;
+              return (
+                <div key={`${sl.day}${sl.dinner}`} className="rounded-2xl border border-line bg-white p-3">
+                  <p className="text-sm font-semibold">
+                    {formatDay(sl.day)} · {sl.dinner ? "Cena" : "Comida"} {full && <span className="ml-1 rounded-full bg-terra px-2 py-0.5 text-[11px] text-white">Completo</span>}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {tables ? `${sl.tables}/${tables} mesas` : `${sl.tables} mesas`} · {seats ? `${sl.people}/${seats} personas` : `${sl.people} personas`}
+                  </p>
+                  {(tables > 0 || seats > 0) && (
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-sand">
+                      <div className={`h-full ${full ? "bg-terra" : "bg-sea"}`} style={{ width: `${Math.min(pct, 1) * 100}%` }} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
       <p className="mb-4 text-sm text-muted">
         El asistente nunca confirma por su cuenta: contacta con el cliente y márcala aquí.
       </p>
@@ -249,6 +302,23 @@ function Info({ restaurant, ok, error }: { restaurant: NonNullable<Awaited<Retur
           Email de contacto del local
           <input name="notify_email" type="email" defaultValue={restaurant.notify_email ?? ""} className={area} />
         </label>
+        <fieldset className="rounded-2xl border border-line bg-white p-4">
+          <legend className="px-1 text-sm font-medium">Mesas y aforo para reservas</legend>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block text-sm">
+              Mesas que se pueden reservar
+              <input name="tables" type="number" min={0} max={500} defaultValue={p.capacity?.tables ?? ""} placeholder="ej. 10" className={area} />
+            </label>
+            <label className="block text-sm">
+              Aforo máximo (personas)
+              <input name="seats" type="number" min={0} max={5000} defaultValue={p.capacity?.seats ?? ""} placeholder="ej. 40" className={area} />
+            </label>
+          </div>
+          <p className="mt-3 text-xs text-muted">
+            Por turno: comida (antes de las 17:00) y cena. Cuando se llena, el chat deja de aceptar reservas para ese
+            turno y le pide al cliente otra hora. Las rechazadas no cuentan. Déjalo vacío si no quieres límite.
+          </p>
+        </fieldset>
         <label className="block text-sm font-medium">
           Horario <span className="font-normal text-muted">(una línea por día: Día | horario)</span>
           <textarea name="hours" rows={6} defaultValue={p.hours.map((h) => `${h.day} | ${h.time}`).join("\n")} className={area} />
@@ -301,6 +371,11 @@ async function Qr({ slug }: { slug: string }) {
         <a href={png} download={`atenlo-qr-${slug}.png`} className="inline-block rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-cream">
           Descargar QR
         </a>
+        <div className="rounded-2xl border border-line bg-white p-4">
+          <p className="text-sm font-medium">📖 Tu carta digital</p>
+          <a href={`${url}/carta`} target="_blank" className="mt-1 block font-mono text-sm break-all text-terra underline">{url}/carta</a>
+          <p className="mt-1 text-xs text-muted">Con precios, alérgenos y filtros, en 3 idiomas. Para una tablet, Instagram o imprimir.</p>
+        </div>
         <ul className="list-disc space-y-1 pl-5 text-sm text-muted">
           <li>Imprímelo en las mesas, la carta o la puerta.</li>
           <li>Pon el enlace en tu ficha de Google Maps (campo “Sitio web” o “Menú”).</li>

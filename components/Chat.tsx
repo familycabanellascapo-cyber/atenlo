@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Lang } from "@/lib/types";
+import type { Client, Lang } from "@/lib/types";
+import MenuView from "./MenuView";
 
-type Msg = { role: "user" | "assistant"; content: string };
+type Msg = { role: "user" | "assistant"; content: string; showMenu?: boolean };
 
 const suggestions: Record<Lang, string[]> = {
   es: ["¿Qué horario tenéis?", "¿Tenéis platos sin gluten?", "¿Se puede ir con perro?", "¿Dónde estáis?"],
@@ -20,6 +21,8 @@ const ui = {
     sent: "✅ ¡Petición enviada! El restaurante te contactará para confirmarla. Tu reserva no está confirmada hasta entonces.",
     sentDemo: "✅ (Demo) Así se enviaría la petición al restaurante. En la demo no se envía nada.",
     bookError: "No se pudo enviar. Revisa los datos o llama al restaurante.",
+    full: "Lo sentimos, para ese día y turno ya no quedan mesas. Prueba otra hora u otro día, o llama al restaurante.",
+    menuBtn: "📖 Ver carta", viewMenu: "📖 Ver la carta completa",
   },
   en: {
     placeholder: "Type your question…", send: "Send", error: "Something went wrong. Please try again.",
@@ -29,6 +32,8 @@ const ui = {
     sent: "✅ Request sent! The restaurant will contact you to confirm. Your booking isn't confirmed until then.",
     sentDemo: "✅ (Demo) This is how the request would reach the restaurant. Nothing is sent in the demo.",
     bookError: "Couldn't send it. Check the details or call the restaurant.",
+    full: "Sorry, there are no tables left for that day and service. Try another time or day, or call the restaurant.",
+    menuBtn: "📖 View menu", viewMenu: "📖 View the full menu",
   },
   de: {
     placeholder: "Ihre Frage…", send: "Senden", error: "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
@@ -38,6 +43,8 @@ const ui = {
     sent: "✅ Anfrage gesendet! Das Restaurant meldet sich zur Bestätigung. Bis dahin ist die Reservierung nicht bestätigt.",
     sentDemo: "✅ (Demo) So würde die Anfrage beim Restaurant ankommen. In der Demo wird nichts gesendet.",
     bookError: "Senden fehlgeschlagen. Bitte Daten prüfen oder das Restaurant anrufen.",
+    full: "Leider sind für diesen Tag und diese Schicht keine Tische mehr frei. Bitte andere Uhrzeit oder anderen Tag wählen oder anrufen.",
+    menuBtn: "📖 Speisekarte", viewMenu: "📖 Ganze Speisekarte ansehen",
   },
 } satisfies Record<Lang, Record<string, string>>;
 
@@ -50,15 +57,18 @@ type Props = {
   welcome: Record<Lang, string>;
   demo?: boolean;
   reservations: boolean;
+  menu: Client["menu"];
 };
 
-export default function Chat({ slug, name, kind, accent, languages, welcome, demo, reservations }: Props) {
+export default function Chat({ slug, name, kind, accent, languages, welcome, demo, reservations, menu }: Props) {
   const [lang, setLang] = useState<Lang>(languages[0]);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const hasMenu = menu.some((s) => s.dishes.length > 0);
   const conversationId = useRef<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -83,12 +93,17 @@ export default function Chat({ slug, name, kind, accent, languages, welcome, dem
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, messages: next, conversationId: conversationId.current, lang }),
+        body: JSON.stringify({
+          slug,
+          messages: next.map(({ role, content }) => ({ role, content })),
+          conversationId: conversationId.current,
+          lang,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       if (data.conversationId) conversationId.current = data.conversationId;
-      setMessages([...next, { role: "assistant", content: data.reply }]);
+      setMessages([...next, { role: "assistant", content: data.reply, showMenu: hasMenu && !!data.showMenu }]);
     } catch {
       setError(true);
     } finally {
@@ -133,7 +148,18 @@ export default function Chat({ slug, name, kind, accent, languages, welcome, dem
         <div className="mx-auto max-w-2xl space-y-3 px-4 py-5">
           <Bubble role="assistant">{welcome[lang]}</Bubble>
           {messages.map((m, i) => (
-            <Bubble key={i} role={m.role}>{m.content}</Bubble>
+            <div key={i} className="space-y-2">
+              <Bubble role={m.role}>{m.content}</Bubble>
+              {m.showMenu && (
+                <button
+                  onClick={() => setMenuOpen(true)}
+                  className="ml-1 rounded-2xl border-2 bg-white px-4 py-3 text-left font-medium shadow-sm"
+                  style={{ borderColor: accent, color: accent }}
+                >
+                  {t.viewMenu} →
+                </button>
+              )}
+            </div>
           ))}
           {loading && (
             <div className="flex">
@@ -184,8 +210,19 @@ export default function Chat({ slug, name, kind, accent, languages, welcome, dem
         }}
         className="border-t border-line bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
       >
-        {reservations && !showBooking && (
-          <div className="mx-auto mb-2 max-w-2xl">
+        {((reservations && !showBooking) || hasMenu) && (
+          <div className="mx-auto mb-2 flex max-w-2xl gap-2">
+            {hasMenu && (
+              <button
+                type="button"
+                onClick={() => setMenuOpen(true)}
+                className="rounded-full border px-3 py-1.5 text-sm font-medium"
+                style={{ borderColor: accent, color: accent }}
+              >
+                {t.menuBtn}
+              </button>
+            )}
+            {reservations && !showBooking && (
             <button
               type="button"
               onClick={() => setShowBooking(true)}
@@ -194,6 +231,7 @@ export default function Chat({ slug, name, kind, accent, languages, welcome, dem
             >
               {t.book}
             </button>
+            )}
           </div>
         )}
         <div className="mx-auto flex max-w-2xl gap-2">
@@ -219,6 +257,20 @@ export default function Chat({ slug, name, kind, accent, languages, welcome, dem
           <a href="/" className="underline">ATENLO</a>
         </p>
       </form>
+
+      {menuOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-cream" role="dialog" aria-modal="true">
+          <MenuView
+            name={name}
+            kind={kind}
+            accent={accent}
+            menu={menu}
+            languages={languages}
+            initialLang={lang}
+            onClose={() => setMenuOpen(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -235,7 +287,7 @@ function BookingForm({
 }) {
   const t = ui[lang];
   const [sending, setSending] = useState(false);
-  const [err, setErr] = useState(false);
+  const [err, setErr] = useState<false | "full" | "error">(false);
   const today = new Date().toISOString().slice(0, 10);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -254,10 +306,14 @@ function BookingForm({
         }),
       });
       const data = await res.json();
+      if (res.status === 409) {
+        setErr("full");
+        return;
+      }
       if (!res.ok) throw new Error(data.error);
       onSent(data.demo ? t.sentDemo : t.sent);
     } catch {
-      setErr(true);
+      setErr("error");
     } finally {
       setSending(false);
     }
@@ -293,7 +349,7 @@ function BookingForm({
         {t.notes}
         <input name="notes" maxLength={300} className={field} />
       </label>
-      {err && <p className="text-sm text-terra-dark">{t.bookError}</p>}
+      {err && <p className="rounded-xl bg-sand p-3 text-sm text-terra-dark">{err === "full" ? t.full : t.bookError}</p>}
       <div className="flex gap-2">
         <button
           type="submit"
