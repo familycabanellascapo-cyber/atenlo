@@ -246,7 +246,7 @@ function Info({ restaurant, ok, error }: { restaurant: NonNullable<Awaited<Retur
         {ok && <p className="rounded-xl bg-sea/10 p-3 text-sm text-sea">Guardado. El asistente ya usa la información nueva.</p>}
         {error && <p className="rounded-xl bg-sand p-3 text-sm text-terra-dark">No se pudo guardar. Inténtalo de nuevo.</p>}
         <label className="block text-sm font-medium">
-          Email para avisos de reserva
+          Email de contacto del local
           <input name="notify_email" type="email" defaultValue={restaurant.notify_email ?? ""} className={area} />
         </label>
         <label className="block text-sm font-medium">

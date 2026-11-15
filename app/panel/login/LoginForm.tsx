@@ -2,20 +2,24 @@
 
 import { useState } from "react";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
+import { site } from "@/lib/site";
 
+// Dos formas de entrar: con un enlace por email (lo normal para los restaurantes,
+// sin contraseña) o con contraseña.
 export default function LoginForm() {
-  const [mode, setMode] = useState<"login" | "reset">("login");
+  const [mode, setMode] = useState<"link" | "password">("link");
   const [msg, setMsg] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
-    const email = String(f.get("email"));
+    const email = String(f.get("email")).trim();
     setBusy(true);
     setMsg(null);
     const supabase = createBrowserSupabase();
-    if (mode === "login") {
+    if (mode === "password") {
       const { error } = await supabase.auth.signInWithPassword({ email, password: String(f.get("password")) });
       if (error) {
         setMsg("Email o contraseña incorrectos.");
@@ -23,13 +27,31 @@ export default function LoginForm() {
         return;
       }
       window.location.href = "/panel";
-    } else {
-      await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/confirm?next=/panel/password`,
-      });
-      setMsg("Si el email existe, te hemos enviado un enlace para crear una contraseña nueva.");
-      setBusy(false);
+      return;
     }
+    // En local, el enlace vuelve a localhost; en la web, a atenlo.com.
+    const base = window.location.hostname === "localhost" ? window.location.origin : site.url;
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${base}/auth/confirm?next=/panel` },
+    });
+    setBusy(false);
+    if (error) {
+      setMsg(error.status === 429 ? "Has pedido muchos enlaces. Espera un minuto y vuelve a probar." : "No se pudo enviar el enlace. Revisa el email.");
+      return;
+    }
+    setSent(true);
+  }
+
+  if (sent) {
+    return (
+      <div className="mt-6 rounded-2xl bg-white p-5">
+        <p className="font-semibold">📩 Revisa tu correo</p>
+        <p className="mt-2 text-sm text-muted">
+          Te hemos enviado un enlace para entrar. Ábrelo en este mismo navegador. Si no lo ves, mira en spam.
+        </p>
+      </div>
+    );
   }
 
   const field = "mt-1 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-ink";
@@ -39,7 +61,7 @@ export default function LoginForm() {
         Email
         <input name="email" type="email" required autoComplete="email" className={field} />
       </label>
-      {mode === "login" && (
+      {mode === "password" && (
         <label className="block text-sm">
           Contraseña
           <input name="password" type="password" required autoComplete="current-password" className={field} />
@@ -47,14 +69,14 @@ export default function LoginForm() {
       )}
       {msg && <p className="text-sm text-terra-dark">{msg}</p>}
       <button disabled={busy} className="w-full rounded-full bg-ink py-3 font-medium text-cream disabled:opacity-50">
-        {mode === "login" ? "Entrar" : "Enviar enlace"}
+        {mode === "link" ? "Enviarme un enlace para entrar" : "Entrar"}
       </button>
       <button
         type="button"
-        onClick={() => { setMode(mode === "login" ? "reset" : "login"); setMsg(null); }}
+        onClick={() => { setMode(mode === "link" ? "password" : "link"); setMsg(null); }}
         className="w-full text-sm text-muted underline"
       >
-        {mode === "login" ? "He olvidado mi contraseña" : "Volver a entrar"}
+        {mode === "link" ? "Entrar con contraseña" : "Entrar con un enlace por email"}
       </button>
     </form>
   );

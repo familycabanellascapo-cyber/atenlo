@@ -1,6 +1,6 @@
 import "server-only";
 import { redirect } from "next/navigation";
-import { createUserClient, supabaseConfigured } from "./supabase/server";
+import { createUserClient } from "./supabase/server";
 import type { RestaurantProfile } from "./types";
 
 export type PanelRestaurant = {
@@ -14,7 +14,6 @@ export type PanelRestaurant = {
 
 /** Usuario con sesión + sus restaurantes (las reglas RLS ya filtran lo que puede ver). */
 export async function requireUser() {
-  if (!supabaseConfigured()) redirect("/panel/login?setup=1");
   const supabase = await createUserClient();
   const { data } = await supabase.auth.getUser();
   if (!data.user) redirect("/panel/login");

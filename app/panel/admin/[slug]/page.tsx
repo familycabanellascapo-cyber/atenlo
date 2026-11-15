@@ -32,7 +32,7 @@ export default async function EditRestaurant({ params, searchParams }: Props) {
               <input name="name" defaultValue={r.name} className={field} />
             </label>
             <label className="block text-sm">
-              Email de avisos
+              Email de contacto
               <input name="notify_email" type="email" defaultValue={r.notify_email ?? ""} className={field} />
             </label>
           </div>

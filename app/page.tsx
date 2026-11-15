@@ -21,7 +21,7 @@ const does = [
   "Responde en español, inglés y alemán, 24 horas",
   "Horarios, carta, precios, terraza, perros, parking, pago…",
   "Alérgenos, solo con la información que tú nos das",
-  "Recoge peticiones de reserva (nombre, día, hora, personas) y te avisa",
+  "Recoge peticiones de reserva (nombre, día, hora, personas) y te las deja en tu panel",
   "Te pasa la conversación cuando no sabe algo",
   "Y con las tarjetas NFC, tus clientes te dejan reseña en Google con solo acercar el móvil",
 ];
@@ -144,7 +144,8 @@ export default function Home() {
                 <li>✓ Asistente en español, inglés y alemán, 24 h</li>
                 <li>✓ Tu página propia + QR para las mesas</li>
                 <li>✓ Carta, alérgenos, horarios e información práctica</li>
-                <li>✓ Peticiones de reserva con aviso al momento</li>
+                <li>✓ Peticiones de reserva directas a tu panel</li>
+                <li>✓ Tu panel: reservas, conversaciones y estadísticas</li>
                 <li>✓ 2 tarjetas NFC para conseguir reseñas en Google</li>
                 <li>✓ Lo configuramos nosotros en 48 h y lo actualizamos cuando lo necesites</li>
               </ul>

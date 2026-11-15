@@ -53,7 +53,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             <input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="bar-juan" className={field} />
           </label>
           <label className="block text-sm">
-            Email del dueño <span className="text-muted">(le llega la invitación)</span>
+            Email del dueño <span className="text-muted">(con él entrará en su panel)</span>
             <input name="owner" type="email" placeholder="juan@ejemplo.com" className={field} />
           </label>
           <button className="w-full rounded-full bg-ink py-2.5 font-medium text-cream">Crear</button>
