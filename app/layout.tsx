@@ -1,57 +1,26 @@
-import type { Metadata } from "next";
-import { Space_Grotesk, Inter, IBM_Plex_Mono } from "next/font/google";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import CookieConsent from "@/components/CookieConsent";
-import { site } from "@/lib/config";
+import type { Metadata, Viewport } from "next";
+import { Fraunces, Inter } from "next/font/google";
+import { site } from "@/lib/site";
 import "./globals.css";
 
-const display = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["500", "700"],
-  variable: "--font-display",
-});
-
-const body = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-body",
-});
-
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
-});
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces" });
 
 export const metadata: Metadata = {
-  title: {
-    default: site.name,
-    template: `%s · ${site.name}`,
-  },
-  description: site.description,
   metadataBase: new URL(site.url),
-  verification: {
-    google: "Z7W6dfvgrBo3prT6BsvAWkrOvoOcd4s7cRFBOCXe9zo",
-  },
+  title: { default: `${site.name} · Asistente para restaurantes en Mallorca`, template: `%s · ${site.name}` },
+  description: site.description,
+  openGraph: { title: site.name, description: site.description, locale: "es_ES", type: "website" },
+  // Verificación de Google Search Console (la misma que tenía la web anterior).
+  verification: { google: "Z7W6dfvgrBo3prT6BsvAWkrOvoOcd4s7cRFBOCXe9zo" },
 };
+
+export const viewport: Viewport = { themeColor: "#faf6ef" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${display.variable} ${body.variable} ${mono.variable}`}>
-      <head>
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9172118549516539"
-          crossOrigin="anonymous"
-        ></script>
-      </head>
-      <body className="font-body bg-ink text-paper min-h-screen flex flex-col antialiased">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <CookieConsent />
-      </body>
+    <html lang="es" className={`${inter.variable} ${fraunces.variable}`}>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }

@@ -1,24 +1,19 @@
 import Link from "next/link";
-import { site } from "@/lib/config";
+import { site } from "@/lib/site";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-line mt-24">
-      <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-muted">
+    <footer className="border-t border-line">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p>
-          © {new Date().getFullYear()} {site.name}. Automatizaciones para negocios, contadas con números reales.
+          <span className="font-display font-semibold text-ink">ATENLO</span> · Hecho en Mallorca ·{" "}
+          <a href={`mailto:${site.email}`} className="hover:text-ink">{site.email}</a>
         </p>
-        <div className="flex gap-5 font-mono">
-          <Link href="/aviso-legal" className="hover:text-paper transition-colors">
-            Aviso legal
-          </Link>
-          <Link href="/politica-de-privacidad" className="hover:text-paper transition-colors">
-            Privacidad
-          </Link>
-          <Link href="/politica-de-cookies" className="hover:text-paper transition-colors">
-            Cookies
-          </Link>
-        </div>
+        <nav className="flex gap-5">
+          <Link href="/aviso-legal" className="hover:text-ink">Aviso legal</Link>
+          <Link href="/privacidad" className="hover:text-ink">Privacidad</Link>
+          <Link href="/cookies" className="hover:text-ink">Cookies</Link>
+        </nav>
       </div>
     </footer>
   );

@@ -1,46 +1,33 @@
 import type { Metadata } from "next";
+import LegalPage from "@/components/LegalPage";
+import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Aviso legal",
-};
+export const metadata: Metadata = { title: "Aviso legal" };
 
 export default function AvisoLegal() {
+  const o = site.owner;
   return (
-    <div className="max-w-prose mx-auto px-6 py-16">
-      <h1 className="font-display text-3xl text-paper mb-6">Aviso legal</h1>
-      <div className="prose-log text-paper">
-        <p className="text-amber">
-          Plantilla de partida, no es asesoría legal. Rellena los datos reales y, si
-          vas a monetizar el sitio, conviene que lo revise un gestor o asesoría antes
-          de publicarlo.
-        </p>
-        <h2>Titular del sitio</h2>
-        <ul>
-          <li>Nombre / razón social: Miquel Cabanellas Capó</li>
-          <li>NIF: 49484431-T</li>
-          <li>Domicilio: Calle Mayor, 21, Palma de Mallorca (Illes Balears)</li>
-          <li>Correo de contacto: mikiarkanz@gmail.com</li>
-        </ul>
-        <h2>Objeto</h2>
-        <p>
-          Este sitio web tiene una finalidad informativa y divulgativa sobre
-          automatización de procesos con inteligencia artificial. El acceso y uso del
-          sitio atribuye la condición de usuario e implica la aceptación de las
-          condiciones aquí descritas.
-        </p>
-        <h2>Propiedad intelectual</h2>
-        <p>
-          Los contenidos publicados (textos, imágenes, código de los ejemplos) son
-          propiedad del titular salvo que se indique lo contrario, y no pueden
-          reproducirse sin autorización.
-        </p>
-        <h2>Publicidad</h2>
-        <p>
-          Este sitio puede mostrar anuncios de terceros (Google AdSense) y enlaces de
-          afiliación. Esto se ampliará en la política de cookies conforme se activen
-          esos servicios.
-        </p>
-      </div>
-    </div>
+    <LegalPage title="Aviso legal">
+      <h2>Titular del sitio</h2>
+      <p>
+        En cumplimiento de la Ley 34/2002 (LSSI-CE): este sitio web ({site.url}) pertenece a {o.name}, con NIF {o.nif} y
+        domicilio en {o.address}. Contacto: {site.email}.
+      </p>
+      <h2>Objeto</h2>
+      <p>
+        ATENLO ofrece a bares y restaurantes un asistente de atención al cliente que responde preguntas usando la
+        información que facilita cada local.
+      </p>
+      <h2>Responsabilidad</h2>
+      <p>
+        La información de cada local (horarios, carta, precios, alérgenos, reservas) la facilita y aprueba el propio
+        local, que es responsable de su exactitud. Las peticiones de reserva hechas a través del asistente no están
+        confirmadas hasta que el local las confirma. Ante cualquier alergia o intolerancia, avisa siempre al personal.
+      </p>
+      <h2>Propiedad intelectual</h2>
+      <p>Los textos, diseño y código de este sitio pertenecen a su titular salvo que se indique lo contrario.</p>
+      <h2>Legislación aplicable</h2>
+      <p>Se aplica la legislación española.</p>
+    </LegalPage>
   );
 }
