@@ -20,9 +20,9 @@ const T = {
   hours: { es: "Nuestro horario:", en: "Our opening hours:", de: "Unsere Öffnungszeiten:" },
   address: { es: "Estamos en", en: "You'll find us at", de: "Sie finden uns in" },
   bookYes: {
-    es: "¡Claro! Para reservar, llama al",
-    en: "Of course! To book, please call",
-    de: "Gerne! Zum Reservieren rufen Sie bitte an:",
+    es: "¡Claro! Pulsa «📅 Reservar mesa» aquí abajo y el restaurante te confirmará. También puedes llamar al",
+    en: "Of course! Tap “📅 Book a table” below and the restaurant will confirm. You can also call",
+    de: "Gerne! Tippen Sie unten auf „📅 Tisch reservieren“, das Restaurant bestätigt Ihnen. Oder rufen Sie an:",
   },
   bookNo: { es: "No aceptamos reservas.", en: "We don't take bookings.", de: "Wir nehmen keine Reservierungen an." },
   menuIntro: { es: "Esta es nuestra carta:", en: "Here's our menu:", de: "Unsere Speisekarte:" },

@@ -1,40 +1,28 @@
 import { NextResponse } from "next/server";
-import { aiAnswer, aiEnabled, extractReservation, type ChatMessage } from "@/lib/ai";
-import { getClient } from "@/lib/clients";
-import { fallbackAnswer } from "@/lib/fallback";
+import { aiAnswer, aiEnabled, type ChatMessage } from "@/lib/ai";
+import { getRestaurant } from "@/lib/clients";
+import { detectLang, fallbackAnswer } from "@/lib/fallback";
+import { clientIp, rateLimited } from "@/lib/ratelimit";
+import { saveExchange } from "@/lib/store";
 
 const MAX_MESSAGES = 20;
 const MAX_CHARS = 600;
 
-// Límite básico por IP para que nadie dispare el gasto de IA.
-// (En memoria: suficiente para empezar; con muchos clientes, pasar a una BD/Redis.)
-const hits = new Map<string, { count: number; reset: number }>();
-function rateLimited(ip: string) {
-  const now = Date.now();
-  const h = hits.get(ip);
-  if (!h || h.reset < now) {
-    hits.set(ip, { count: 1, reset: now + 10 * 60_000 });
-    return false;
-  }
-  h.count++;
-  return h.count > 40;
-}
-
 export async function POST(req: Request) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
-  if (rateLimited(ip)) {
+  if (rateLimited(`chat:${clientIp(req)}`, 40, 10 * 60_000)) {
     return NextResponse.json({ error: "Demasiados mensajes. Prueba en unos minutos." }, { status: 429 });
   }
 
-  let body: { slug?: unknown; messages?: unknown };
+  let body: { slug?: unknown; messages?: unknown; conversationId?: unknown; lang?: unknown };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Petición no válida" }, { status: 400 });
   }
 
-  const client = typeof body.slug === "string" ? getClient(body.slug) : undefined;
-  if (!client) return NextResponse.json({ error: "Local no encontrado" }, { status: 404 });
+  const restaurant = typeof body.slug === "string" ? await getRestaurant(body.slug) : null;
+  if (!restaurant) return NextResponse.json({ error: "Local no encontrado" }, { status: 404 });
+  const client = restaurant.client;
 
   if (!Array.isArray(body.messages) || body.messages.length === 0) {
     return NextResponse.json({ error: "Sin mensajes" }, { status: 400 });
@@ -51,6 +39,8 @@ export async function POST(req: Request) {
   if (!last || last.role !== "user" || !last.content.trim()) {
     return NextResponse.json({ error: "Mensaje vacío" }, { status: 400 });
   }
+  const lang = typeof body.lang === "string" && ["es", "en", "de"].includes(body.lang) ? body.lang : detectLang(last.content);
+  const conversationId = typeof body.conversationId === "string" ? body.conversationId : null;
 
   let reply: string;
   let mode: "ai" | "basic" = "basic";
@@ -66,11 +56,6 @@ export async function POST(req: Request) {
     reply = fallbackAnswer(client, last.content);
   }
 
-  const { text, reservation } = extractReservation(reply);
-  if (reservation) {
-    // TODO (fase 3): guardar en Supabase y avisar al local por email/WhatsApp.
-    console.log(`[reserva] ${client.slug}:`, reservation);
-  }
-
-  return NextResponse.json({ reply: text, mode, reservation: Boolean(reservation) });
+  const convId = await saveExchange(restaurant, conversationId, lang, last.content, reply);
+  return NextResponse.json({ reply, mode, conversationId: convId });
 }

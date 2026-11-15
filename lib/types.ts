@@ -44,3 +44,6 @@ export type Client = {
   // A quién avisar cuando el asistente no sabe responder.
   handoff: { name: string; channel: string };
 };
+
+/** Lo que se guarda en la columna `profile` de Supabase (la ficha sin slug ni nombre). */
+export type RestaurantProfile = Omit<Client, "slug" | "name" | "demo">;
