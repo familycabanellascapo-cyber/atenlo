@@ -2,7 +2,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PhoneMockup from "@/components/PhoneMockup";
-import { whatsappLink } from "@/lib/site";
+import ContactButton from "@/components/ContactButton";
 
 const questions = [
   { lang: "ES", q: "¿Abrís hoy a mediodía?" },
@@ -41,7 +41,6 @@ const faqs = [
 ];
 
 export default function Home() {
-  const cta = whatsappLink("Hola, tengo un local y me interesa ATENLO.");
   return (
     <>
       <Header />
@@ -150,9 +149,9 @@ export default function Home() {
                 <li>✓ Lo configuramos nosotros en 48 h y lo actualizamos cuando lo necesites</li>
               </ul>
               <p className="mt-5 text-sm font-medium text-sea">Sin permanencia · Cancela cuando quieras</p>
-              <a href={cta} className="mt-6 block rounded-full bg-terra py-3 text-center font-medium text-white hover:bg-terra-dark">
+              <ContactButton source="precios" className="w-full mt-6 block rounded-full bg-terra py-3 text-center font-medium text-white hover:bg-terra-dark">
                 Quiero mi plaza de fundador
-              </a>
+              </ContactButton>
             </div>
           </div>
         </section>
@@ -180,9 +179,9 @@ export default function Home() {
             <p className="mx-auto mt-3 max-w-xl opacity-90">
               Escríbenos y en 48 h lo tienes funcionando. Precio fundador para los primeros 20 locales.
             </p>
-            <a href={cta} className="mt-8 inline-block rounded-full bg-white px-7 py-3 font-medium text-terra-dark hover:bg-cream">
-              Hablemos
-            </a>
+            <ContactButton source="final" className="mt-8 inline-block rounded-full bg-white px-7 py-3 font-medium text-terra-dark hover:bg-cream">
+              Solicitar demo gratis
+            </ContactButton>
           </div>
         </section>
       </main>

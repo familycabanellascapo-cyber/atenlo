@@ -67,3 +67,13 @@ export async function inviteOwner(formData: FormData) {
   const { data, error } = await supabase.rpc("admin_invite", { p_restaurant: String(formData.get("id")), p_email: email });
   back(`/panel/admin/${slug}`, error ? `Error: ${error.message}` : inviteMsg(email, data as string));
 }
+
+export async function updateLead(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const status = String(formData.get("status") ?? "");
+  const patch: { status?: string; notes?: string | null } = {};
+  if (["new", "contacted", "client", "discarded"].includes(status)) patch.status = status;
+  if (formData.has("notes")) patch.notes = String(formData.get("notes")).trim().slice(0, 1000) || null;
+  await supabase.from("leads").update(patch).eq("id", String(formData.get("id")));
+  revalidatePath("/panel/admin");
+}

@@ -13,7 +13,7 @@ await db.exec(`
   grant usage on schema public, auth to anon, authenticated;
   grant execute on function auth.uid() to anon, authenticated;
 `);
-for (const f of ["0001_init.sql", "0002_no_secret_key.sql"]) {
+for (const f of ["0001_init.sql", "0002_no_secret_key.sql", "0003_leads.sql"]) {
   await db.exec(readFileSync(new URL(`../supabase/migrations/${f}`, import.meta.url), "utf8"));
 }
 
@@ -121,6 +121,25 @@ check("al registrarse, el invitado queda unido a su local",
 await as("anon", null, async () => {
   check("restaurante desactivado no se ve", (await rows("select * from public.get_restaurant('bar-nuevo')")).length === 0);
 });
+
+// ───── Solicitudes de contacto (0003) ─────
+const lead = (name, phone, email = "") =>
+  `select public.create_lead('${name}', 'Bar Sol', 'Bar', 'Palma', '${phone}', '${email}', 'Hola', 'test') as ok`;
+await as("anon", null, async () => {
+  check("anónimo envía una solicitud", (await rows(lead("Toni", "600 111 222", "toni@x.com")))[0].ok === true);
+  check("solicitud sin teléfono válido rechazada", await fails_(lead("Toni", "12")));
+  check("solicitud con email raro rechazada", await fails_(lead("Toni", "600111222", "no-es-email")));
+  check("anónimo NO puede leer solicitudes", await fails_("select * from public.leads"));
+});
+await as("authenticated", A, async () => {
+  check("un dueño NO ve las solicitudes", (await rows("select * from public.leads")).length === 0);
+});
+await as("authenticated", ADM, async () => {
+  check("admin ve la solicitud", (await rows("select * from public.leads")).length === 1);
+  await db.query("update public.leads set status = 'contacted', notes = 'Llamado el lunes'");
+  check("admin no puede cambiar los datos que envió el cliente", await fails_("update public.leads set phone = '0'"));
+});
+check("admin marcó la solicitud como contactada", (await rows("select status from public.leads"))[0].status === "contacted");
 
 console.log(fails ? `\n${fails} fallos` : "\nTodo correcto");
 process.exit(fails ? 1 : 0);

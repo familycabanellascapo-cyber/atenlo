@@ -41,8 +41,11 @@ export default function Privacidad() {
       <p>No escribas en el chat datos de salud, bancarios ni otros datos sensibles.</p>
       <h2>Si contactas con ATENLO</h2>
       <p>
-        Si nos escribes por correo o WhatsApp, ATENLO es responsable de esos datos y los usa solo para responderte y,
-        si contratas, para prestarte el servicio y facturar.
+        Si rellenas el formulario de contacto o nos escribes por correo o WhatsApp, ATENLO es responsable de esos
+        datos (nombre, local, teléfono, email, municipio y mensaje). Los usamos solo para contactarte sobre el
+        servicio y, si contratas, para prestártelo y facturar. Base legal: tu consentimiento y tu solicitud.
+        Los guardamos mientras haya relación comercial o, si no contratas, como máximo 12 meses. Se alojan en
+        Supabase (servidores en la UE).
       </p>
       <h2>Tus derechos</h2>
       <p>

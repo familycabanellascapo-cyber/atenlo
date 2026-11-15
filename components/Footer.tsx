@@ -9,7 +9,8 @@ export default function Footer() {
           <span className="font-display font-semibold text-ink">ATENLO</span> · Hecho en Mallorca ·{" "}
           <a href={`mailto:${site.email}`} className="hover:text-ink">{site.email}</a>
         </p>
-        <nav className="flex gap-5">
+        <nav className="flex flex-wrap gap-x-5 gap-y-2">
+          <Link href="/panel/login" className="font-medium text-ink hover:text-terra">Iniciar sesión</Link>
           <Link href="/aviso-legal" className="hover:text-ink">Aviso legal</Link>
           <Link href="/privacidad" className="hover:text-ink">Privacidad</Link>
           <Link href="/cookies" className="hover:text-ink">Cookies</Link>

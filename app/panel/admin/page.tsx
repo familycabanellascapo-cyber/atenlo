@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/panel";
 import { createRestaurant } from "./actions";
+import Leads from "./Leads";
 
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ msg?: string }> }) {
-  const { msg } = await searchParams;
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ msg?: string; leads?: string }> }) {
+  const { msg, leads: leadFilter } = await searchParams;
   const { supabase } = await requireAdmin();
   const { data: list } = await supabase.from("restaurants").select("id, slug, name, active, created_at").order("created_at", { ascending: false });
   const { data: pending } = await supabase.from("reservations").select("restaurant_id").eq("status", "pending");
+  const { data: leads } = await supabase.from("leads").select("*").order("created_at", { ascending: false }).limit(200);
   const pendingBy = new Map<string, number>();
   for (const p of pending ?? []) pendingBy.set(p.restaurant_id, (pendingBy.get(p.restaurant_id) ?? 0) + 1);
 
@@ -16,6 +18,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       <Link href="/panel" className="text-sm text-muted hover:text-ink">← Panel</Link>
       <h1 className="mt-4 mb-6 font-display text-3xl font-semibold">Administración</h1>
       {msg && <p className="mb-6 rounded-xl bg-sand p-3 text-sm">{msg}</p>}
+
+      <Leads leads={leads ?? []} filter={leadFilter ?? ""} />
 
       <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
         <section>
